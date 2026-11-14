@@ -814,6 +814,10 @@ window.Limbo = (function () {
 })();
 </script>
 <script>
+/* Lien de déploiement Google Apps Script (Google Sheet des scores) */
+window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbyOh1xg06PP-DiouksFKseJsXKi9TPn9F7EL4V-Mqb3ZdKlCQQ7ZxEfqytNUr3sxq4J/exec" };
+</script>
+<script>
 /* ======================= À MODIFIER ======================= */
 var THEME = "Lobaka fotsy + Jean Bleu + Tennis Fotsy";   /* le thème, affiché sur la page theme.html après la vidéo */
 var VIDEO_URL = "https://res.cloudinary.com/djz4uow1p/video/upload/v1794603780/fond_objuk7.mp4";   /* lien Cloudinary de la vidéo */
@@ -842,10 +846,10 @@ var QUESTIONS = [
   var $ = function (id) { return document.getElementById(id); };
   var LETTERS = ["A", "B", "C", "D", "E", "F"];
   var Limbo = window.Limbo || { stroll: function () {}, cruise: function () {}, ask: function () {}, resolve: function () {}, dawn: function (d, cb) { setTimeout(cb, 500); }, wolf: function () {}, caught: function (cb) { setTimeout(cb, 300); } };
-  var st = { i: 0, phase: "welcome", score: 0, pick: -1, timer: null, t0: 0, name: "", err: 0, over: false, joker: true, off: [] };
+  var st = { i: 0, phase: "welcome", score: 0, pick: -1, timer: null, t0: 0, name: "", err: 0, over: false, joker: true, off: [], ms: 0 };
 
   function clearT() { clearInterval(st.timer); st.timer = null; $("tl").classList.remove("on", "low", "warm", "hot"); $("secs").className = ""; $("secs").textContent = ""; $("beat").style.setProperty("--bi", 0); }
-  function reset() { clearT(); st.i = 0; st.phase = "welcome"; st.score = 0; st.pick = -1; st.err = 0; st.over = false; st.joker = true; st.off = []; Limbo.wolf(0); }
+  function reset() { clearT(); st.i = 0; st.phase = "welcome"; st.score = 0; st.pick = -1; st.err = 0; st.over = false; st.joker = true; st.off = []; st.ms = 0; Limbo.wolf(0); }
 
   function render() {
     var total = QUESTIONS.length, q = QUESTIONS[st.i], ph = st.phase, opts = $("opts"), main = $("main");
@@ -942,12 +946,12 @@ var QUESTIONS = [
   function pick(k) {
     if (st.phase !== "ask") return;
     if (k >= 0 && st.off.indexOf(k) >= 0) return;
-    clearT(); Limbo.tension(1); st.pick = k; st.phase = "feedback";
+    st.ms += Math.min(QZ_SECONDS * 1000, Date.now() - st.t0); clearT(); Limbo.tension(1); st.pick = k; st.phase = "feedback";
     var good = k === QUESTIONS[st.i].c; if (good) st.score++;
     if (good) { st.err = 0; Limbo.wolf(0); Limbo.resolve(true); }
     else {
       st.err++;
-      if (st.err >= MAX_ERRORS) { st.over = true; Limbo.caught(function () { if (st.over && st.phase === "feedback") { st.phase = "over"; render(); $("main").focus(); } }); }
+      if (st.err >= MAX_ERRORS) { st.over = true; Limbo.caught(function () { if (st.over && st.phase === "feedback") { st.phase = "over"; saveScore("loup"); render(); $("main").focus(); } }); }
       else { Limbo.resolve(false); Limbo.wolf(st.err); }
     }
     render(); if (!st.over) $("main").focus();
@@ -968,9 +972,26 @@ var QUESTIONS = [
       fetch(VIDEO_URL).then(function (r) { if (!r.ok || !r.body || !r.body.getReader) return; var rd = r.body.getReader(); return (function pump() { return rd.read().then(function (x) { if (!x.done) return pump(); }); })(); }).catch(function () {});
     } catch (e) {}
   }
+  /* Classement : le score est envoyé au Google Sheet (via l'application web Apps Script de config.js).
+     Chaque joueur est reconnu par un identifiant anonyme gardé dans son navigateur ; le Sheet conserve son meilleur résultat. */
+  var saved = false;
+  function playerId() {
+    var id = null;
+    try { id = localStorage.getItem("cpr_pid"); } catch (e) {}
+    if (!id) { id = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); try { localStorage.setItem("cpr_pid", id); } catch (e) {} }
+    return id;
+  }
+  function saveScore(outcome) {
+    if (saved) return; saved = true;
+    var rec = { id: playerId(), name: st.name || "Anonyme", score: st.score, total: QUESTIONS.length, ms: Math.round(st.ms), outcome: outcome, at: Date.now() };
+    try { var b = JSON.parse(localStorage.getItem("cpr_best") || "null"); if (!b || rec.score > b.score || (rec.score === b.score && rec.ms < b.ms)) localStorage.setItem("cpr_best", JSON.stringify(rec)); } catch (e) {}
+    var url = window.CPR_CONFIG && CPR_CONFIG.SCORES_URL;
+    if (!url) return;
+    try { fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(rec), keepalive: true }).catch(function () {}); } catch (e) {}
+  }
   function goTheme() { location.href = "theme.html?v=" + encodeURIComponent(VIDEO_URL) + "&t=" + encodeURIComponent(THEME); }
   function light() {
-    st.phase = "light"; clearT(); document.body.classList.add("dawn");
+    st.phase = "light"; clearT(); document.body.classList.add("dawn"); saveScore("lumiere");
     $("main").hidden = true; $("again").hidden = true;
     preload();
     Limbo.dawn(DAWN_SECONDS, goTheme);
