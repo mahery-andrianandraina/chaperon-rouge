@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Précédemment en Team Building</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Quicksand:wght@500;600;700&family=Big+Shoulders+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400;1,6..72,500&display=swap">
+<style>
+/* Concept : une salle de projection. Bandes noires de format cinéma, un épisode par thème,
+   photo du thème en plein cadre avec travelling lent, titres en capitales condensées,
+   commentaires Teams qui surgissent à des endroits aléatoires.
+   Le look est volontairement sombre et unique (pas de thème clair). */
+:root {
+  --ink: #0d0f16;
+  --ink-2: #161a28;
+  --bone: #ece6d9;
+  --bone-dim: #aaa699;
+  --line: rgba(236, 230, 217, 0.18);
+  --gold: #e8b64a;
+  --tint: #e8b64a;
+  --bar: clamp(52px, 9vh, 84px);
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  --f-display: "Big Shoulders Display", "Oswald", "Arial Narrow", sans-serif;
+  --f-serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --f-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; margin: 0; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+[hidden] { display: none !important; }
+body { background: var(--ink); color: var(--bone); font-family: var(--f-serif); overflow-x: hidden; }
+* { box-sizing: border-box; }
+
+.stage { position: relative; height: 100%; min-height: 540px; overflow: hidden; background: var(--ink); isolation: isolate; }
+
+/* Grain de pellicule */
+.grain {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.16; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.flash { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: #fff; opacity: 0; }
+.flash.go { animation: flash 0.7s ease-out; }
+@keyframes flash { 0% { opacity: 0.5; } 100% { opacity: 0; } }
+
+/* Vidéo de fond : fond.mp4, placée dans le même dossier que cette page */
+#bgv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0; transition: opacity 0.9s ease; background: var(--ink); }
+.stage.has-video #bgv { opacity: 1; }
+.vshade { position: absolute; inset: 0; z-index: 1; pointer-events: none; display: none;
+  background: linear-gradient(180deg, rgba(6, 7, 12, 0.6) 0%, rgba(6, 7, 12, 0.35) 45%, rgba(6, 7, 12, 0.72) 100%); }
+.stage.has-video .vshade { display: block; }
+
+/* Rideau de transition entre épisodes */
+.wipe {
+  position: absolute; z-index: 3; top: 0; bottom: 0; left: -10%; width: 120%; pointer-events: none;
+  background: var(--wc, var(--gold)); transform: translateX(-110%);
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+.wipe.go { animation: wipe 1s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+@keyframes wipe {
+  0% { transform: translateX(-110%); }
+  45% { transform: translateX(0); }
+  55% { transform: translateX(0); }
+  100% { transform: translateX(110%); }
+}
+
+/* Bandes noires */
+.bar {
+  position: absolute; left: 0; right: 0; height: var(--bar); z-index: 6; background: #000;
+  display: flex; align-items: center; gap: 16px;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+}
+.bar-top { top: 0; }
+.bar-bottom { bottom: 0; justify-content: space-between; }
+.progress { display: flex; gap: 6px; flex: 1; min-width: 0; }
+.seg { flex: 1; height: 3px; background: rgba(236, 230, 217, 0.18); position: relative; overflow: hidden; }
+.seg i { position: absolute; inset: 0; background: var(--seg, var(--gold)); transform: scaleX(0); transform-origin: left; }
+.seg.done i { transform: scaleX(1); }
+.seg.now i { animation: fill var(--dur, 8s) linear forwards; }
+@keyframes fill { to { transform: scaleX(1); } }
+.actions { display: flex; gap: 8px; align-items: center; }
+
+/* Typographie */
+.label { display: block; font: 500 0.72rem/1.3 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--bone-dim); }
+.label b { color: var(--tint); font-weight: 500; }
+.display { font-family: var(--f-display); font-weight: 900; text-transform: uppercase; line-height: 0.9; letter-spacing: 0.01em; text-wrap: balance; margin: 0; }
+.lede { font: italic 400 clamp(1.15rem, 2.4vw, 1.6rem)/1.35 var(--f-serif); max-width: 34ch; margin: 0; }
+.note { text-transform: none; letter-spacing: 0.04em; }
+
+/* Boutons */
+.btn {
+  font: 500 0.78rem/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--bone);
+  background: transparent; border: 1px solid var(--line); padding: 0 16px; min-height: 44px; border-radius: 2px;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.btn:hover { border-color: var(--bone); }
+.btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.btn.primary { background: var(--bone); color: var(--ink); border-color: var(--bone); }
+.btn.primary:hover { background: #fff; }
+.btn:disabled { opacity: 0.38; cursor: not-allowed; }
+.btn:disabled:hover { border-color: var(--line); }
+.btn-next { min-height: calc(var(--bar) - 16px); padding: 0 26px; font-size: 0.95rem; letter-spacing: 0.14em; border-color: var(--bone-dim); display: inline-flex; align-items: center; gap: 14px; }
+.btn-next::after { content: "→"; font-size: 1.35em; line-height: 1; }
+.btn-next.ready { background: var(--gold); color: #0d0f16; border-color: var(--gold); animation: ready 1.4s ease-in-out infinite; }
+.btn-next.ready:hover { background: #f4c866; border-color: #f4c866; }
+@keyframes ready { 50% { box-shadow: 0 0 0 9px rgba(232, 182, 74, 0.3); } }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+body[data-mode="idle"] .btn-skip, body[data-mode="end"] .btn-skip,
+body[data-mode="idle"] .btn-next, body[data-mode="end"] .btn-next { display: none; }
+
+/* Scènes */
+.scene { position: absolute; inset: 0; z-index: 2; opacity: 0; visibility: hidden; transition: opacity 0.55s ease, visibility 0s linear 0.55s; }
+.scene.on { opacity: 1; visibility: visible; transition: opacity 0.55s ease; }
+.scene.reset, .scene.reset * { transition: none !important; animation: none !important; }
+.glow {
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    radial-gradient(90% 70% at 15% 105%, color-mix(in srgb, var(--tint) 30%, transparent), transparent 62%),
+    radial-gradient(60% 50% at 95% 0%, color-mix(in srgb, var(--tint) 12%, transparent), transparent 70%);
+}
+.inner {
+  position: relative; z-index: 1; height: 100%; overflow-y: auto;
+  padding-top: calc(var(--bar) + 20px); padding-bottom: calc(var(--bar) + 20px);
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  gap: clamp(20px, 4vw, 72px); align-items: end;
+}
+.inner.one { grid-template-columns: minmax(0, 1fr); }
+.inner.center { display: grid; place-items: center; grid-template-columns: minmax(0, 1fr); }
+.col-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.col-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.rv { opacity: 0; transform: translateY(14px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.rv.shown { opacity: 1; transform: none; }
+
+/* Lettres des titres (accueil et fin) */
+.w { display: inline-block; white-space: nowrap; }
+.ch { display: inline-block; opacity: 0; transform: translateY(0.5em); filter: blur(6px);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.6s ease;
+  transition-delay: calc(var(--i, 0) * 40ms); }
+.shown > .w > .ch { opacity: 1; transform: none; filter: none; }
+
+/* Accueil */
+.idle-title { font-size: clamp(2.8rem, 9vw, 8rem); }
+.eplist { list-style: none; margin: 0; padding: 0; }
+.eplist li {
+  display: grid; grid-template-columns: 3ch 10px minmax(0, 1fr); gap: 12px; align-items: center;
+  padding: 11px 0; border-top: 1px solid var(--line);
+  font: 400 0.8rem/1.2 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.eplist .n { color: var(--bone-dim); font-variant-numeric: tabular-nums; }
+.eplist .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.eplist small { display: block; margin-top: 3px; color: var(--bone-dim); font-size: 0.66rem; letter-spacing: 0.1em; }
+
+/* Amorce */
+.leader { position: relative; width: min(56vw, 300px); aspect-ratio: 1; max-width: 100%; border: 2px solid var(--bone); border-radius: 50%; display: grid; place-items: center; }
+.leader::before, .leader::after { content: ""; position: absolute; background: var(--line); }
+.leader::before { left: -14%; right: -14%; top: 50%; height: 1px; }
+.leader::after { top: -14%; bottom: -14%; left: 50%; width: 1px; }
+.leader .ring { position: absolute; inset: 12%; border: 1px solid var(--line); border-radius: 50%; }
+.leader .sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(rgba(236, 230, 217, 0.22) 0 90deg, transparent 90deg); animation: spin 0.85s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.count { position: relative; font: 900 clamp(6rem, 24vw, 11rem)/1 var(--f-display); }
+.recap { font: italic 400 clamp(2rem, 6.2vw, 5rem)/1.05 var(--f-serif); margin: 0; max-width: 16ch; }
+
+/* Épisode : photo du thème en plein cadre */
+.photo-wrap { position: absolute; inset: 0; z-index: -2; overflow: hidden; background: var(--ink); }
+.photo { position: absolute; inset: -8%; background-size: cover; background-position: center; transform: scale(1.06); will-change: transform; }
+.photo.go { animation: kb var(--kb-dur, 9s) ease-out forwards; }
+@keyframes kb {
+  from { transform: scale(1.06) translate(var(--x0, 0%), var(--y0, 0%)); }
+  to { transform: scale(1.22) translate(var(--x1, 0%), var(--y1, 0%)); }
+}
+.photo.ph {
+  background:
+    radial-gradient(40% 50% at 22% 30%, color-mix(in srgb, var(--tint) 75%, transparent), transparent 70%),
+    radial-gradient(45% 55% at 78% 70%, color-mix(in srgb, var(--tint) 45%, #40476b), transparent 72%),
+    radial-gradient(50% 60% at 60% 15%, color-mix(in srgb, var(--tint) 30%, #1a2a52), transparent 70%),
+    linear-gradient(135deg, color-mix(in srgb, var(--tint) 35%, var(--ink)), var(--ink));
+}
+.shade {
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(6, 7, 12, 0.9) 0%, rgba(6, 7, 12, 0.62) 42%, rgba(6, 7, 12, 0.1) 100%),
+    linear-gradient(0deg, rgba(6, 7, 12, 0.85) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(6, 7, 12, 0.5) 0%, transparent 22%);
+}
+.ph-label { position: absolute; z-index: 0; right: var(--gutter-r); top: calc(var(--bar) + 14px); text-align: right; }
+#sceneGame .inner { grid-template-columns: minmax(0, 1fr); }
+#sceneGame .col-main { max-width: 50%; }
+.ep-title { font-size: clamp(2.6rem, 7.6vw, 7rem); }
+.ep-title .wm { display: inline-block; overflow: hidden; vertical-align: bottom; padding: 0.04em 0.06em 0.1em 0; }
+.ep-title .wm > span { display: inline-block; transform: translateY(108%); transition: transform 0.85s cubic-bezier(0.2, 0.9, 0.2, 1); transition-delay: calc(var(--wi, 0) * 160ms); }
+.ep-title.shown .wm > span { transform: none; }
+
+/* Bandeau en bas de l'image, comme à la télé */
+.lower {
+  display: flex; gap: 20px; align-items: flex-end; justify-content: space-between; margin-top: 4px;
+  opacity: 0; transform: translateX(-28px);
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+.lower.shown { opacity: 1; transform: none; }
+.lt { display: flex; gap: 14px; min-width: 0; }
+.lt-bar { width: 4px; flex: none; background: var(--tint); transform-origin: top; transform: scaleY(0); transition: transform 0.6s 0.1s cubic-bezier(0.2, 0.9, 0.2, 1); }
+.lower.shown .lt-bar { transform: none; }
+.lt-text { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.lt-game { font: 900 clamp(1.3rem, 2.6vw, 2rem)/1.05 var(--f-display); text-transform: uppercase; letter-spacing: 0.04em; }
+.lt-msg { font: italic 400 clamp(1rem, 1.7vw, 1.25rem)/1.3 var(--f-serif); max-width: 40ch; }
+.counter { white-space: nowrap; }
+.counter b { display: inline-block; font-variant-numeric: tabular-nums; }
+.counter.bump b { animation: bump 0.35s ease-out; }
+@keyframes bump { 40% { transform: scale(1.6); } }
+
+/* Mur de commentaires : les captures Teams apparaissent à des endroits aléatoires */
+.wall { position: absolute; z-index: 1; left: 52%; right: var(--gutter-r); top: calc(var(--bar) + 16px); bottom: calc(var(--bar) + 16px); }
+.shot {
+  position: absolute; width: min(300px, 88%);
+  opacity: 0; transform: scale(0.85) rotate(var(--rot, 0deg));
+  transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.shot.in { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+.shot.out { opacity: 0; transform: scale(0.94) rotate(var(--rot, 0deg)); transition-duration: 0.25s; }
+.shot .card { border-radius: 8px; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6); animation: float var(--fd, 6s) ease-in-out var(--fdel, 0s) infinite alternate; }
+@keyframes float { from { transform: translateY(-5px) rotate(-0.5deg); } to { transform: translateY(5px) rotate(0.5deg); } }
+.card.mock { display: flex; gap: 10px; padding: 12px 14px; background: #f3f2f1; color: #242424; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+.card .av { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 600 0.8rem/1 "Segoe UI", system-ui, sans-serif; color: #fff; background: var(--av, #5b5fc7); }
+.card .bd { min-width: 0; }
+.card .hd { display: flex; gap: 8px; align-items: baseline; font-size: 0.78rem; }
+.card .hd b { font-weight: 600; }
+.card .hd span { color: #616161; font-size: 0.72rem; }
+.card .tx { margin-top: 3px; font-size: 0.95rem; line-height: 1.35; overflow-wrap: anywhere; }
+.card .tx .emo { display: inline-block; width: 24px; height: 24px; vertical-align: -6px; margin-left: 3px; }
+.card.img { background: #fff; overflow: hidden; line-height: 0; }
+.card.img img { display: block; width: 100%; height: auto; max-height: clamp(120px, 32vh, 280px); object-fit: contain; background: #fff; }
+.tag {
+  position: absolute; z-index: 1; left: 12px; top: -11px; padding: 5px 8px; border-radius: 2px;
+  font: 500 0.62rem/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase;
+  background: var(--tint); color: #0d0f16; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Fin */
+.end-title { font-size: clamp(3.4rem, 13vw, 11.5rem); }
+.end-name { font: italic 400 clamp(1.6rem, 4vw, 3rem)/1.15 var(--f-serif); margin: 0; }
+
+.theme-title { font-size: clamp(2.8rem, 9.5vw, 8.5rem); }
+
+.quiz-title { font-size: clamp(2.2rem, 4.6vw, 4.2rem); line-height: 1; }
+.inner.quiz { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+.lock { display: grid; gap: 8px; padding: 14px 16px; border: 1px dashed var(--line); border-radius: 2px; max-width: 34rem; background: rgba(6, 7, 12, 0.35); }
+.lock-text { font: 900 clamp(1.2rem, 2.3vw, 1.8rem)/1.25 var(--f-display); letter-spacing: 0.14em; color: var(--bone-dim); overflow-wrap: anywhere; }
+#endActions { display: flex; flex-direction: column; gap: 10px; }
+#endActions:not(.shown) { pointer-events: none; }
+.btn.confirm { background: var(--gold); color: #0d0f16; border-color: var(--gold); }
+.rules { list-style: none; margin: 0; padding: 0; }
+.rules li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: 12px; padding: 11px 0; border-top: 1px solid var(--line);
+  opacity: 0; transform: translateX(18px); transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); transition-delay: calc(var(--i, 0) * 140ms); }
+#endRules.shown .rules li { opacity: 1; transform: none; }
+.rules .rn { font: 900 1.7rem/1 var(--f-display); color: var(--tint); font-variant-numeric: tabular-nums; }
+.rules strong { display: block; font: 900 1.05rem/1.15 var(--f-display); text-transform: uppercase; letter-spacing: 0.06em; }
+.rules .d { display: block; margin-top: 3px; font: 400 0.98rem/1.35 var(--f-serif); color: var(--bone-dim); }
+
+@media (max-width: 760px) {
+  .inner.quiz { gap: 14px; align-items: stretch; }
+  .inner.quiz > .col-main { display: contents; }
+  .inner.quiz #endRules { order: 5; }
+  .inner.quiz #endActions { order: 6; }
+  .inner.quiz > :first-child { margin-top: 0; }
+}
+@media (max-width: 760px) {
+  .inner { display: flex; flex-direction: column; gap: 24px; }
+  .inner > :first-child { margin-top: auto; }
+  .inner.center { display: grid; }
+  .inner.center > :first-child { margin-top: 0; }
+  #sceneGame .col-main { max-width: none; gap: 12px; }
+  #sceneGame .inner > :first-child { margin-top: 0; }
+  .ep-title { font-size: clamp(2.2rem, 10vw, 4.4rem); }
+  .shade { background: linear-gradient(180deg, rgba(6, 7, 12, 0.88), rgba(6, 7, 12, 0.5) 55%, rgba(6, 7, 12, 0.75)); }
+  .wall { left: var(--gutter-l); top: auto; height: 40%; bottom: calc(var(--bar) + 12px); }
+  .shot { width: min(260px, 72%); }
+  .lower { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .ph-label { display: none; }
+}
+@media (max-width: 560px) {
+  #status { display: none; }
+  .bar-bottom { justify-content: flex-end; }
+  .btn { padding: 0 9px; font-size: 0.66rem; letter-spacing: 0.08em; }
+  .actions { gap: 6px; flex: 1; }
+  .btn-next { flex: 1; justify-content: center; padding: 0 14px; font-size: 0.82rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ch { transform: none !important; filter: none !important; transition: opacity 0.3s !important; transition-delay: 0s !important; }
+  .ep-title .wm > span { transform: none !important; opacity: 0; transition: opacity 0.3s !important; transition-delay: 0s !important; }
+  .ep-title.shown .wm > span { opacity: 1; }
+  .rv, .lower { transform: none !important; }
+  .leader .sweep, .photo.go, .shot .card, .btn-next.ready { animation: none !important; }
+  .wipe.go, .flash.go { animation: none !important; }
+}
+
+/* ===== Thème « Nuit magique » (inspiration conte de fées, fond 3D) ===== */
+:root { --ink: #070b2e; --ink-2: #1a1458; --bone: #eceaff; --bone-dim: #b9b4ff; --line: rgba(185, 180, 255, 0.3);
+  --gold: #ffd76a; --tint: #ffd76a; --teal: #5ee0d6;
+  --f-display: "Cinzel", "Newsreader", Georgia, serif; --f-mono: "Quicksand", system-ui, sans-serif; }
+#bg3d { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block;
+  background: linear-gradient(180deg, #070b2e 0%, #1a1458 55%, #3a2380 100%); }
+.bar { background: #04061a; }
+.display { font-weight: 700; line-height: 1.1; letter-spacing: 0.02em; text-shadow: 0 0 28px rgba(255, 215, 106, 0.35); }
+.idle-title { font-size: clamp(2.2rem, 6.6vw, 6rem); }
+.ep-title { font-size: clamp(2rem, 5.2vw, 5rem); color: var(--gold); }
+.end-title { font-size: clamp(2.6rem, 9vw, 8rem); }
+.theme-title { font-size: clamp(2.2rem, 7vw, 6.4rem); color: var(--gold); }
+.quiz-title { font-size: clamp(1.8rem, 3.8vw, 3.6rem); line-height: 1.08; }
+.count { font-family: var(--f-display); }
+.label, .btn, .tag { font-family: var(--f-mono); font-weight: 700; }
+.shade { background:
+  linear-gradient(90deg, rgba(5, 7, 32, 0.78) 0%, rgba(5, 7, 32, 0.42) 42%, rgba(5, 7, 32, 0) 100%),
+  linear-gradient(0deg, rgba(5, 7, 32, 0.7) 0%, transparent 34%),
+  linear-gradient(180deg, rgba(5, 7, 32, 0.4) 0%, transparent 20%); }
+.btn { border-radius: 999px; }
+.btn.primary, .btn.confirm { background: var(--gold); color: #1b1740; border-color: var(--gold); }
+.btn.primary:hover { background: #ffe597; }
+.btn-next { padding: 0 32px; }
+.btn-next.ready { background: var(--gold); color: #1b1740; border-color: var(--gold);
+  box-shadow: 0 0 0 6px rgba(255, 215, 106, 0.28), 0 0 34px rgba(255, 215, 106, 0.55); animation: ready 1.4s ease-in-out infinite; }
+.btn-next.ready:hover { background: #ffe597; border-color: #ffe597; }
+@keyframes ready { 50% { box-shadow: 0 0 0 13px rgba(255, 215, 106, 0.16), 0 0 46px rgba(255, 215, 106, 0.85); } }
+.card.mock { background: #f4f1ff; color: #1b1740; border-radius: 16px; }
+.shot .card { border-radius: 16px; box-shadow: 0 14px 34px rgba(4, 6, 30, 0.6); }
+.card .av { background: var(--av, #7c5cff); }
+.tag { border-radius: 999px; padding: 5px 10px; }
+.lock { border-radius: 14px; background: rgba(7, 11, 46, 0.55); border-color: var(--line); }
+.seg { background: rgba(185, 180, 255, 0.25); }
+@media (max-width: 760px) {
+  .ep-title { font-size: clamp(1.8rem, 8vw, 3.4rem); }
+  .shade { background: linear-gradient(180deg, rgba(5, 7, 32, 0.8), rgba(5, 7, 32, 0.4) 55%, rgba(5, 7, 32, 0.7)); }
+}
+
+/* Lisibilité : voile plus fort derrière les textes, ombre douce sur les lettres */
+.shade { background:
+  linear-gradient(90deg, rgba(5, 7, 32, 0.8) 0%, rgba(5, 7, 32, 0.5) 38%, rgba(5, 7, 32, 0.12) 68%, rgba(5, 7, 32, 0) 100%),
+  linear-gradient(0deg, rgba(5, 7, 32, 0.6) 0%, transparent 34%),
+  linear-gradient(180deg, rgba(5, 7, 32, 0.4) 0%, transparent 20%); }
+.inner { text-shadow: 0 2px 16px rgba(3, 4, 24, 0.95), 0 0 3px rgba(3, 4, 24, 0.8); }
+.card, .card * , .btn { text-shadow: none; }
+.display { text-shadow: 0 2px 16px rgba(3, 4, 24, 0.95), 0 0 24px rgba(255, 215, 106, 0.25); }
+.nshade { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse at 28% 55%, rgba(5, 7, 32, 0.32) 0%, rgba(5, 7, 32, 0.12) 45%, transparent 75%); }
+@media (max-width: 760px) {
+  .shade { background: linear-gradient(180deg, rgba(5, 7, 32, 0.9), rgba(5, 7, 32, 0.6) 55%, rgba(5, 7, 32, 0.8)); }
+}
+
+a.btn { text-decoration: none; display: inline-flex; align-items: center; }
+
+/* ===== Transition vers le quiz : 10 secondes, le village se déforme, rouille, puis disparaît ===== */
+#shFx { position: fixed; inset: 0; z-index: 60; overflow: hidden; cursor: progress; background: transparent; }
+#shFx[hidden] { display: none !important; }
+#shFx > * { position: absolute; inset: 0; pointer-events: none; }
+.sh-fog { inset: -10%; opacity: 0; filter: blur(16px); animation: shdrift 7s ease-in-out infinite alternate;
+  background:
+    radial-gradient(60% 50% at 20% 72%, rgba(205, 205, 205, 0.6), transparent 70%),
+    radial-gradient(70% 60% at 82% 40%, rgba(190, 190, 190, 0.5), transparent 72%),
+    radial-gradient(90% 60% at 50% 105%, rgba(215, 215, 215, 0.7), transparent 70%),
+    radial-gradient(50% 40% at 60% 15%, rgba(180, 180, 180, 0.35), transparent 70%); }
+@keyframes shdrift { from { transform: translateX(-4%) scale(1); } to { transform: translateX(4%) scale(1.08); } }
+#shAsh { width: 100%; height: 100%; opacity: 0; }
+.sh-noise { opacity: 0; mix-blend-mode: overlay; inset: -20%; animation: shnoise 0.45s steps(5) infinite;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+@keyframes shnoise { 0% { transform: translate(0, 0); } 25% { transform: translate(-4%, 3%); } 50% { transform: translate(3%, -4%); } 75% { transform: translate(-3%, -2%); } 100% { transform: translate(4%, 4%); } }
+.sh-red { opacity: 0; background: radial-gradient(ellipse at 50% 55%, rgba(120, 0, 0, 0) 25%, rgba(150, 0, 0, 0.8) 100%); }
+.sh-vig { opacity: 0; background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.9) 100%); }
+.sh-black { background: #000; opacity: 0; }
+.sh-figure { inset: auto; left: 70%; bottom: 14%; width: auto; height: 34vh; opacity: 0; transform-origin: 50% 100%; filter: blur(1.5px); }
+.sh-figure svg { height: 100%; width: auto; display: block; }
+.sh-tear { position: absolute; inset: auto; left: 0; right: 0; backdrop-filter: invert(1) contrast(1.6); -webkit-backdrop-filter: invert(1) contrast(1.6); }
+.stage.sh-shake { translate: var(--sx, 0) var(--sy, 0); }
+@media (prefers-reduced-motion: reduce) { #shFx { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <canvas id="bg3d" aria-hidden="true"></canvas>
+  <div class="nshade" aria-hidden="true"></div>
+  <div class="grain"></div>
+  <div class="flash" id="flash"></div>
+  <div class="wipe" id="wipe"></div>
+
+  <div class="bar bar-top"><div class="progress" id="progress" aria-hidden="true"></div></div>
+
+  <!-- Accueil -->
+  <section class="scene on" id="sceneIdle">
+    <div class="glow"></div>
+    <div class="inner">
+      <div class="col-main">
+        <span class="label"><b>Version test</b> · intro cinématique</span>
+        <h1 class="display idle-title">Précédemment…</h1>
+        <p class="lede">Les thèmes passés, avec l'annonce faite sur Teams et les commentaires de chacun. Puis le nouveau jeu.</p>
+        <div class="row"><button class="btn primary" id="btnStart" type="button">Lancer l'intro</button></div>
+        <span class="label note">Thèmes et commentaires repris de commentaire.xlsx. Les photos des thèmes restent à ajouter.</span>
+      </div>
+      <div class="col-side">
+        <span class="label">Épisodes</span>
+        <ol class="eplist" id="eplist"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Amorce -->
+  <section class="scene" id="sceneLeader">
+    <div class="glow"></div>
+    <div class="inner center">
+      <div class="leader" aria-hidden="true"><div class="ring"></div><div class="sweep"></div><div class="count" id="count">3</div></div>
+    </div>
+  </section>
+
+  <!-- Précédemment -->
+  <section class="scene" id="sceneRecap">
+    <div class="glow"></div>
+    <div class="inner one">
+      <div class="col-main">
+        <span class="label rv" id="rcLabel">Épisodes précédents</span>
+        <p class="recap rv" id="rcText">Précédemment, dans nos team buildings…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Épisode : un thème, sa photo, les commentaires des équipes -->
+  <section class="scene" id="sceneGame">
+    <div class="photo-wrap" aria-hidden="true"><div class="photo" id="photo"></div></div>
+    <div class="shade" aria-hidden="true"></div>
+    <span class="label ph-label" id="phLabel">Photo du thème · exemple</span>
+    <div class="inner">
+      <div class="col-main">
+        <span class="label"><b id="epNum">Épisode 1 / 5</b> · thème révélé</span>
+        <h2 class="display ep-title" id="epTitle"></h2>
+        <div class="lower" id="lower">
+          <div class="lt" id="lt">
+            <span class="lt-bar"></span>
+            <div class="lt-text">
+              <span class="label">Annonce sur Teams</span>
+              <strong class="lt-game" id="ltGame"></strong>
+              <span class="lt-msg" id="ltMsg"></span>
+            </div>
+          </div>
+          <span class="label counter" id="counter"><b id="cNum">0</b> <span id="cLbl">commentaire</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="wall" id="wall"></div>
+  </section>
+
+  <!-- Nouveau jeu : le quiz qui débloque le thème -->
+  <section class="scene" id="sceneEnd">
+    <div class="glow"></div>
+    <div class="inner quiz">
+      <div class="col-main">
+        <span class="label rv" id="endEyebrow"></span>
+        <h2 class="display quiz-title" id="endTitle"></h2>
+        <p class="end-name rv" id="endName"></p>
+        <div class="lock rv" id="endLock">
+          <span class="label">Thème secret · verrouillé</span>
+          <span class="lock-text" id="lockText" aria-hidden="true"></span>
+        </div>
+        <div class="rv" id="endActions">
+          <div class="row">
+            <a class="btn primary" id="btnQuiz" href="quiz.html">Aller au quiz</a>
+            <button class="btn" id="btnReplay" type="button">Revoir l'intro</button>
+            <button class="btn" id="btnTheme" type="button" hidden>Révéler le thème</button>
+          </div>
+          <span class="label note">Le quiz s'ouvre sur une autre page. Chacun joue seul, sur son écran. À la fin, le thème se débloque.</span>
+        </div>
+      </div>
+      <div class="col-side" id="endRules">
+        <span class="label"><b>Règles du quiz</b></span>
+        <ol class="rules" id="rules"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nouveau thème -->
+  <section class="scene" id="sceneTheme">
+    <div class="glow"></div>
+    <div class="inner one">
+      <div class="col-main">
+        <span class="label rv" id="thLabel"><b>Nouveau thème</b></span>
+        <h2 class="display theme-title" id="thTitle"></h2>
+        <div class="row rv" id="thActions"><button class="btn" id="btnBack" type="button">Retour</button></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bar bar-bottom">
+    <span class="label" id="status" role="status">Prêt à lancer</span>
+    <div class="actions">
+      <button class="btn btn-next" id="btnNext" type="button">Thème suivant</button>
+    </div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="shWarp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="shTurb" type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="3" result="n"/><feDisplacementMap id="shDisp" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+<div id="shFx" hidden aria-hidden="true">
+  <div class="sh-fog"></div>
+  <canvas id="shAsh"></canvas>
+  <div class="sh-figure"><svg viewBox="0 0 60 200" aria-hidden="true"><g fill="#000"><circle cx="31" cy="17" r="9.5"/><path d="M26 25h10l2 16c3 10 4 26 3 42l-2 34h-4l-1 38h-5l-1-38h-4l-2-34c-1-16 0-32 3-42z"/><path d="M26 30l-8 38-4 52 3 1 6-48 5-27zM36 30l8 38 3 52-3 1-7-48-4-27z"/><path d="M27 110l-3 80h4l3-72zM34 110l3 80h-4l-3-72z"/></g></svg></div>
+  <div class="sh-noise"></div>
+  <div class="sh-red"></div>
+  <div class="sh-vig"></div>
+  <div class="sh-black"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ===== Contenu issu de commentaire.xlsx ===== */
+  /* theme : le thème annoncé. announcer / message : qui l'a annoncé sur Teams et son message.
+     photo : image du thème (chemin de fichier), vide = vidéo de fond ou dégradé.
+     comments : { who, text, emoji } ; ils passent dans l'ordre du fichier. */
+  var GAMES = [
+    {
+      "theme": "Fitafy Malagasy",
+      "announcer": "Laingo RAZAFIARISON",
+      "message": "Ny theme tsika manaraka zany dia fitafy malagasy",
+      "comments": [
+        {
+          "who": "Angelo RAJAONARIVONY",
+          "text": "ahona tsara muh le hoe fitafy malagasy e"
+        },
+        {
+          "who": "Nantenaina RAMAMONJISOA",
+          "text": "manao zipo izany vehivavy miaraka kapa an"
+        },
+        {
+          "who": "Benasoavina",
+          "text": "Ny lehilahy koa zany manao kapa"
+        },
+        {
+          "who": "Andri JEAN NOELSON",
+          "text": "kiranilina lesy Benasoavina a"
+        },
+        {
+          "who": "Laingo RAZAFIARISON",
+          "text": "mampiseho ny fitafiny foko 18"
+        },
+        {
+          "who": "Nantenaina RAMAMONJISOA",
+          "text": "lambahoany izany",
+          "emoji": [
+            "timide"
+          ]
+        },
+        {
+          "who": "Faniry RAKOTOFIRINGA",
+          "text": "misy modeliste mihitsy eto io aloha no inspiraka",
+          "emoji": [
+            "rire"
+          ]
+        },
+        {
+          "who": "Nantenaina RAMAMONJISOA",
+          "text": "Poon aloha dia Rasalama martiora",
+          "emoji": [
+            "fou"
+          ]
+        },
+        {
+          "who": "Nantenaina RAMAMONJISOA",
+          "text": "Onintsoa Ratrema be, rehefa mandeha moa dia tena drai2 Ratrematrema mihintsy"
+        }
+      ],
+      "tint": "#e8b64a",
+      "photo": ""
+    },
+    {
+      "theme": "Veste + Jean Bleu",
+      "announcer": "Nantenaina RAMAMONJISOA",
+      "message": "Ny theme tsika manaraka zany Veste + Jean Bleu",
+      "comments": [
+        {
+          "who": "Nantenaina RAMAMONJISOA",
+          "text": "Palitao ilay veste sao misy tsy mahay"
+        },
+        {
+          "who": "Angelo RAJAONARIVONY",
+          "text": "mba congé za am lundy ah"
+        },
+        {
+          "who": "Nantenaina RAMAMONJISOA",
+          "text": "afaka mampanofa izay manana 2"
+        },
+        {
+          "who": "Erika RAVELOMANANTSOA",
+          "text": "Ary lasa theme hatrany ambany fa nga tsy oe tsisy mahita zay ambany?"
+        },
+        {
+          "who": "Faniry RAKOTOFIRINGA",
+          "text": "afaka esorina le veste rehefa mafana ny andro a",
+          "emoji": [
+            "rire"
+          ]
+        },
+        {
+          "who": "Andri JEAN NOELSON",
+          "text": "tsy maintsy le tam soratra ihany ty no avoaka zan"
+        }
+      ],
+      "tint": "#4fb3a2",
+      "photo": ""
+    },
+    {
+      "theme": "Stripe",
+      "announcer": "Lova",
+      "message": "Ny theme tsika manaraka zany dia stripe",
+      "comments": [
+        {
+          "who": "Andri JEAN NOELSON",
+          "text": "mba zai akahay"
+        },
+        {
+          "who": "Erika RAVELOMANANTSOA",
+          "text": "Tsara hariva. Toa tsisy nanao commentaire lay stripe? Pas de nouvelles, bonnes nouvelles. Tsara daholo lay stripe dia tsisy miteny. Ankasitrahana foana lay ezaka manaraka theme a"
+        },
+        {
+          "who": "Faniry RAKOTOFIRINGA",
+          "text": "CC otran efa zatra mahita hangers sy coupe types angamba",
+          "emoji": [
+            "rire",
+            "rire"
+          ]
+        },
+        {
+          "who": "Henintsoa RAHARIMONJY",
+          "text": "cc, mankasitraka daholo e! sady ahitana karazany anie lay stripe ato @ ekipa ato e",
+          "emoji": [
+            "sourire"
+          ]
+        },
+        {
+          "who": "Lanto RAHARISANDRATANA",
+          "text": "Nianatra zavatra momba ny stripe aho androany fa misaotra antsika, kay misy karazany maro."
+        }
+      ],
+      "tint": "#c9628a",
+      "photo": ""
+    }
+  ];
+  var EMO = {"timide": "data:image/png;base64,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", "rire": "data:image/png;base64,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", "fou": "data:image/png;base64,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", "sourire": "data:image/png;base64,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"};
+  /* Dernière ligne du fichier, sans commentaire : le thème à dévoiler avec le bouton de fin. */
+  var NEW_THEME = {"theme": "Lobaka fotsy + Jean Bleu + Tennis Fotsy", "tint": "#8a8fe6"};
+  var NEW_GAME = { eyebrow: "Nouveau jeu · le quiz", label: "Jouez pour découvrir le thème", name: "Le thème est verrouillé. Seul le quiz peut l'ouvrir.", tint: "#e8b64a" };
+  /* Règles du quiz affichées sur l'écran de fin : modifiez les textes ici (nombre de questions, durée, points). */
+  var RULES = [
+    { "t": "Jouez seul", "d": "Chacun joue sur son propre écran, sans équipe et sans animateur. Entrez votre prénom si vous le souhaitez." },
+    { "t": "Lisez la question", "d": "Le quiz compte 10 questions. Chacune propose quatre réponses : A, B, C ou D." },
+    { "t": "20 secondes pour répondre", "d": "Touchez ou cliquez une réponse. Elle ne se change plus. Sans réponse au bout de 20 secondes, la question vaut 0 point." },
+    { "t": "Marquez des points", "d": "Bonne réponse : 1 point. Mauvaise réponse : 0 point, rien n'est retiré. La bonne réponse s'affiche après chaque question." },
+    { "t": "Jouez franc jeu", "d": "Pas de recherche, pas de capture d'écran partagée, et pas d'aide d'un collègue. Le quiz est personnel." },
+    { "t": "Découvrez le thème", "d": "À la fin du quiz, le thème se débloque pour vous. Gardez-le pour vous jusqu'à la fin du jeu." }
+  ];
+
+  /* ===================================================== */
+
+  var $ = function (id) { return document.getElementById(id); };
+  var body = document.body;
+  var scenes = { idle: $("sceneIdle"), leader: $("sceneLeader"), recap: $("sceneRecap"), game: $("sceneGame"), end: $("sceneEnd"), theme: $("sceneTheme") };
+  var CANCEL = {};
+  var token = 0;
+  var curEp = -1; /* épisode en cours, -1 avant le premier */
+
+  /* ----- Interface : progression et liste ----- */
+  var segs = GAMES.map(function (g) {
+    var s = document.createElement("span");
+    s.className = "seg";
+    s.style.setProperty("--seg", g.tint);
+    s.innerHTML = "<i></i>";
+    $("progress").appendChild(s);
+    return s;
+  });
+  GAMES.forEach(function (g, i) {
+    var li = document.createElement("li");
+    li.innerHTML = '<span class="n"></span><span class="dot"></span><span><span class="th"></span><small></small></span>';
+    li.querySelector(".n").textContent = String(i + 1).padStart(2, "0");
+    li.querySelector(".th").textContent = g.theme;
+    var nc = (g.comments || []).length;
+    li.querySelector("small").textContent = nc ? nc + (nc > 1 ? " commentaires" : " commentaire") : "Commentaires à venir";
+    li.querySelector(".dot").style.setProperty("--c", g.tint);
+    $("eplist").appendChild(li);
+  });
+
+  /* ----- Écran du quiz : règles et thème masqué ----- */
+  RULES.forEach(function (r, i) {
+    var li = document.createElement("li");
+    li.style.setProperty("--i", i);
+    li.innerHTML = '<span class="rn"></span><div><strong></strong><span class="d"></span></div>';
+    li.querySelector(".rn").textContent = i + 1;
+    li.querySelector("strong").textContent = r.t;
+    li.querySelector(".d").textContent = r.d;
+    $("rules").appendChild(li);
+  });
+  /* Les lettres sont cachées, la forme du thème (mots et « + ») reste visible */
+  $("lockText").textContent = NEW_THEME.theme.replace(/[^\s+]/g, "•");
+
+  /* ----- Aides ----- */
+  function setMode(m) { body.dataset.mode = m; }
+  function setStatus(t) { $("status").textContent = t; }
+  function show(name) { Object.keys(scenes).forEach(function (k) { scenes[k].classList.toggle("on", k === name); }); }
+  function reflow() { void $("stage").offsetWidth; }
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function sleep(ms, id) {
+    return new Promise(function (res, rej) { setTimeout(function () { id === token ? res() : rej(CANCEL); }, ms); });
+  }
+  function splitTitle(el, text) {
+    el.textContent = "";
+    el.setAttribute("aria-label", text);
+    var idx = 0;
+    text.split(" ").forEach(function (w) {
+      var word = document.createElement("span");
+      word.className = "w";
+      word.setAttribute("aria-hidden", "true");
+      Array.from(w).forEach(function (c) {
+        var s = document.createElement("span");
+        s.className = "ch";
+        s.style.setProperty("--i", idx++);
+        s.textContent = c;
+        word.appendChild(s);
+      });
+      el.appendChild(word);
+      el.appendChild(document.createTextNode(" "));
+    });
+  }
+  function splitWords(el, text) {
+    el.textContent = "";
+    el.setAttribute("aria-label", text);
+    text.split(" ").forEach(function (w, i) {
+      var m = document.createElement("span");
+      m.className = "wm";
+      m.setAttribute("aria-hidden", "true");
+      var s = document.createElement("span");
+      s.style.setProperty("--wi", i);
+      s.textContent = w;
+      m.appendChild(s);
+      el.appendChild(m);
+      el.appendChild(document.createTextNode(" "));
+    });
+  }
+  function flash() { var f = $("flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go"); }
+  function resetProgress() { segs.forEach(function (s) { s.classList.remove("now", "done"); }); }
+  function loadImage(src) {
+    return new Promise(function (res) {
+      var im = new Image(), done = false;
+      function end(ok) { if (!done) { done = true; res(ok); } }
+      im.onload = function () { end(true); };
+      im.onerror = function () { end(false); };
+      setTimeout(function () { end(false); }, 2500);
+      im.src = src;
+    });
+  }
+
+  /* Page silencieuse : aucun son. Ces fonctions vides gardent le reste du code simple. */
+  function snd() {}
+  function audioInit() {}
+  function droneOn() {}
+  function droneOff() {}
+
+  /* ----- Fond 3D « Nuit magique » (silencieux) ----- */
+function startNight3D() {
+  "use strict";
+  if (!window.THREE) return false;
+  var canvas = document.getElementById("bg3d");
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true }); }
+  catch (e) { return false; }
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var SPEED = reduce ? 0.25 : 1;
+  var PR = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(PR);
+  renderer.setClearColor(0x070b2e, 1);
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(60, 1, 1, 2000);
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function glowTex(stops, size) {
+    var c = document.createElement("canvas"); c.width = c.height = size || 256;
+    var g = c.getContext("2d"), h = c.width / 2;
+    var gr = g.createRadialGradient(h, h, 0, h, h, h);
+    stops.forEach(function (s) { gr.addColorStop(s[0], s[1]); });
+    g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height);
+    return new THREE.CanvasTexture(c);
+  }
+
+  /* ---------- Ciel (dégradé + lueur d'horizon) ---------- */
+  var sky = new THREE.Mesh(
+    new THREE.SphereGeometry(900, 32, 16),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false,
+      vertexShader: "varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }",
+      fragmentShader: "varying vec3 vP; void main(){ float h = normalize(vP).y;" +
+        "vec3 top = vec3(0.027,0.043,0.18); vec3 mid = vec3(0.10,0.08,0.35); vec3 low = vec3(0.42,0.25,0.62);" +
+        "vec3 c = mix(low, mid, smoothstep(0.0,0.35,h)); c = mix(c, top, smoothstep(0.3,0.95,h));" +
+        "c += vec3(0.25,0.12,0.30) * exp(-abs(h)*9.0) * 0.55; gl_FragColor = vec4(c,1.0); }"
+    })
+  );
+  sky.renderOrder = -10; scene.add(sky);
+
+  /* ---------- Étoiles scintillantes ---------- */
+  var ptVert = "attribute float aSize; attribute float aPhase; attribute vec3 aColor;" +
+    "uniform float uTime; uniform float uPR; uniform float uAtt; varying vec3 vC; varying float vA;" +
+    "void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0);" +
+    "float tw = 0.55 + 0.45*sin(uTime*0.8 + aPhase*6.2831);" +
+    "float sz = aSize*uPR*mix(1.0, 200.0/max(-mv.z,1.0), uAtt);" +
+    "gl_PointSize = sz*(0.7+0.5*tw); vC = aColor; vA = 0.5+0.5*tw; gl_Position = projectionMatrix*mv; }";
+  var ptFrag = "varying vec3 vC; varying float vA; void main(){ float d = length(gl_PointCoord-0.5);" +
+    "float a = pow(smoothstep(0.5,0.0,d),1.7); gl_FragColor = vec4(vC, a*vA); }";
+  function makePoints(n, build, att) {
+    var pos = new Float32Array(n * 3), col = new Float32Array(n * 3), size = new Float32Array(n), ph = new Float32Array(n);
+    for (var i = 0; i < n; i++) build(i, pos, col, size, ph);
+    var g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    g.setAttribute("aColor", new THREE.BufferAttribute(col, 3));
+    g.setAttribute("aSize", new THREE.BufferAttribute(size, 1));
+    g.setAttribute("aPhase", new THREE.BufferAttribute(ph, 1));
+    var m = new THREE.ShaderMaterial({
+      vertexShader: ptVert, fragmentShader: ptFrag, transparent: true, depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: { uTime: { value: 0 }, uPR: { value: PR }, uAtt: { value: att ? 1 : 0 } }
+    });
+    var p = new THREE.Points(g, m); p.frustumCulled = false; scene.add(p); return p;
+  }
+  var palette = [[1, 1, 1], [1, 1, 1], [1, 0.96, 0.8], [0.8, 0.9, 1], [1, 0.84, 0.42], [0.37, 0.88, 0.84]];
+  var stars = makePoints(900, function (i, pos, col, size, ph) {
+    var th = rnd(0, Math.PI * 2), y = Math.pow(Math.random(), 0.8) * 0.95 + 0.02, r = rnd(500, 700);
+    var s = Math.sqrt(1 - y * y);
+    pos[i * 3] = Math.cos(th) * s * r; pos[i * 3 + 1] = y * r; pos[i * 3 + 2] = Math.sin(th) * s * r;
+    var c = palette[(Math.random() * palette.length) | 0];
+    col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2];
+    size[i] = Math.random() < 0.06 ? rnd(5, 8) : rnd(1.6, 3.6); ph[i] = Math.random();
+  }, false);
+
+  /* ---------- Lune en croissant + halo ---------- */
+  (function () {
+    var halo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTex([[0, "rgba(255,236,170,.55)"], [0.25, "rgba(255,215,106,.22)"], [1, "rgba(255,215,106,0)"]], 256),
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    halo.scale.set(300, 300, 1); halo.position.set(-170, 150, -520); scene.add(halo);
+    var c = document.createElement("canvas"); c.width = c.height = 256; var g = c.getContext("2d");
+    g.fillStyle = "#fff3c8"; g.beginPath(); g.arc(128, 128, 96, 0, 7); g.fill();
+    g.globalCompositeOperation = "destination-out"; g.beginPath(); g.arc(166, 108, 86, 0, 7); g.fill();
+    var moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+    moon.scale.set(110, 110, 1); moon.position.set(-170, 150, -510); scene.add(moon);
+  })();
+
+  /* ---------- Nébuleuses douces ---------- */
+  var neb = [];
+  [[-260, 120, -480, "rgba(124,92,255,.40)", 520], [240, 190, -500, "rgba(94,224,214,.22)", 460], [40, 90, -460, "rgba(232,165,181,.18)", 420]]
+    .forEach(function (n) {
+      var s = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: glowTex([[0, n[3]], [1, "rgba(0,0,0,0)"]], 256), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+      s.scale.set(n[4], n[4] * 0.6, 1); s.position.set(n[0], n[1], n[2]); s.userData.x = n[0]; s.userData.k = Math.random() * 6; scene.add(s); neb.push(s);
+    });
+
+  /* ---------- Crêtes de montagnes en couches ---------- */
+  function ridge(z, color, base, amp, seed, bumpX, bumpH) {
+    var sh = new THREE.Shape(); sh.moveTo(-900, -200);
+    for (var x = -900; x <= 900; x += 12) {
+      var y = base + amp * (0.55 * Math.sin(x * 0.006 + seed) + 0.3 * Math.sin(x * 0.015 + seed * 2.1) + 0.15 * Math.sin(x * 0.04 + seed * 3.7));
+      if (bumpH) y += bumpH * Math.exp(-Math.pow((x - bumpX) / 85, 2));
+      sh.lineTo(x, y);
+    }
+    sh.lineTo(900, -200); sh.closePath();
+    var m = new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshBasicMaterial({ color: color }));
+    m.position.z = z; scene.add(m); return m;
+  }
+  ridge(-330, 0x3a2a80, 42, 34, 1.3);
+  ridge(-250, 0x261c6c, 24, 30, 4.1);
+  var hill = ridge(-160, 0x120f48, 6, 12, 7.7, 70, 22);
+
+  /* ---------- Château (silhouette 3D) ---------- */
+  var castle = new THREE.Group(), cMat = new THREE.MeshBasicMaterial({ color: 0x070a2c }), wins = [];
+  function box(w, h, d, x, y, z) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), cMat); m.position.set(x, y + h / 2, z || 0); castle.add(m); }
+  function roof(r, h, x, y, z) { var m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 8), cMat); m.position.set(x, y + h / 2, z || 0); castle.add(m); }
+  function tower(x, w, h, rh, z) { box(w, h, w, x, 0, z); roof(w * 0.78, rh, x, h, z); }
+  var wMat = new THREE.MeshBasicMaterial({ color: 0xffd76a, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  function win(x, y, z, s) { var m = new THREE.Mesh(new THREE.PlaneGeometry(s || 1.6, (s || 1.6) * 1.6), wMat.clone()); m.position.set(x, y, z); m.userData.k = Math.random() * 10; castle.add(m); wins.push(m); }
+  box(70, 22, 14, 0, 0, 0);
+  tower(0, 14, 46, 22, -2); tower(-26, 10, 34, 17, 3); tower(26, 10, 38, 18, 3);
+  tower(-48, 8, 26, 13, 6); tower(48, 8, 28, 14, 6);
+  box(12, 10, 5, 0, 22, 6);
+  for (var i = -3; i <= 3; i++) box(4, 3, 2, i * 9, 22, 4);
+  [[0, 40], [0, 30], [-26, 26], [26, 30], [-48, 18], [48, 20], [-14, 12], [14, 12], [-34, 10], [34, 10], [0, 12]].forEach(function (w) { win(w[0], w[1], 8.2); });
+  castle.position.set(70, 22 * 0 + 8, -160); castle.scale.setScalar(1.15); scene.add(castle);
+
+  /* ---------- Brume basse ---------- */
+  var mist = [];
+  for (var m = 0; m < 6; m++) {
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTex([[0, "rgba(160,140,255,.28)"], [1, "rgba(160,140,255,0)"]], 128), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    s.scale.set(rnd(260, 380), rnd(34, 50), 1); s.position.set(rnd(-300, 300), rnd(4, 14), rnd(-200, -140));
+    s.userData.v = rnd(2, 5) * (Math.random() < 0.5 ? -1 : 1); scene.add(s); mist.push(s);
+  }
+
+  /* ---------- Premier plan sombre ---------- */
+  ridge(-70, 0x04061a, -24, 5, 9.2);
+
+  /* ---------- Étincelles qui montent (volume 3D) ---------- */
+  var N = 150;
+  var sp = makePoints(N, function (i, pos, col, size, ph) {
+    pos[i * 3] = rnd(-160, 160); pos[i * 3 + 1] = rnd(-5, 110); pos[i * 3 + 2] = rnd(-150, 30);
+    var c = Math.random() < 0.6 ? [1, 0.84, 0.42] : (Math.random() < 0.6 ? [0.37, 0.88, 0.84] : [1, 1, 1]);
+    col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2];
+    size[i] = rnd(1.8, 4.2); ph[i] = Math.random();
+  }, true);
+  var spV = new Float32Array(N), spS = new Float32Array(N);
+  for (var j = 0; j < N; j++) { spV[j] = rnd(0.7, 2.2); spS[j] = Math.random() * 6; }
+
+  /* ---------- Étoiles filantes ---------- */
+  var streakTex = (function () {
+    var c = document.createElement("canvas"); c.width = 256; c.height = 8; var g = c.getContext("2d");
+    var gr = g.createLinearGradient(0, 0, 256, 0);
+    gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(0.85, "rgba(255,236,170,.8)"); gr.addColorStop(1, "rgba(255,255,255,1)");
+    g.fillStyle = gr; g.fillRect(0, 2, 256, 4); return new THREE.CanvasTexture(c);
+  })();
+  var streaks = [];
+  for (var k = 0; k < 3; k++) {
+    var st = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({
+      map: streakTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    st.scale.set(90, 2.6, 1); st.userData = { t: -1 }; scene.add(st); streaks.push(st);
+  }
+  var nextStreak = 2;
+  function launchStreak() {
+    for (var i = 0; i < streaks.length; i++) {
+      var s = streaks[i]; if (s.userData.t >= 0) continue;
+      var a = rnd(-0.55, -0.25); // descend vers la droite
+      s.userData = { t: 0, dur: rnd(0.9, 1.5), x: rnd(-350, 200), y: rnd(190, 340), vx: Math.cos(a) * 520, vy: Math.sin(a) * 520, a: a };
+      s.rotation.z = a; return;
+    }
+  }
+
+  /* ---------- Caméra, souris, boucle ---------- */
+  var mx = 0, my = 0, tx = 0, ty = 0;
+  window.addEventListener("pointermove", function (e) { tx = e.clientX / innerWidth * 2 - 1; ty = e.clientY / innerHeight * 2 - 1; });
+  function resize() {
+    var w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.fov = w / h < 0.8 ? 75 : 60; camera.updateProjectionMatrix();
+  }
+  addEventListener("resize", resize); resize();
+
+  var clock = new THREE.Clock(), time = 0, running = true;
+  document.addEventListener("visibilitychange", function () { running = !document.hidden; if (running) { clock.getDelta(); loop(); } });
+  function loop() {
+    if (!running) return;
+    requestAnimationFrame(loop);
+    var dt = Math.min(clock.getDelta(), 0.05) * SPEED; time += dt;
+    mx += (tx - mx) * 0.04; my += (ty - my) * 0.04;
+    var drift = (Math.sin(time * 0.05) * 0.5 + 0.5);
+    camera.position.set(Math.sin(time * 0.12) * 14 + mx * 12, 10 + Math.sin(time * 0.09) * 3 - my * 4, 62 - drift * 26);
+    camera.lookAt(mx * 8 + Math.sin(time * 0.07) * 6, 40 - my * 6, -150);
+
+    stars.material.uniforms.uTime.value = time; sp.material.uniforms.uTime.value = time;
+    stars.rotation.y = time * 0.004;
+    neb.forEach(function (n) { n.position.x = n.userData.x + Math.sin(time * 0.05 + n.userData.k) * 30; });
+    mist.forEach(function (s) { s.position.x += s.userData.v * dt; if (s.position.x > 340) s.position.x = -340; if (s.position.x < -340) s.position.x = 340; });
+    wins.forEach(function (w) { w.material.opacity = 0.55 + 0.45 * Math.sin(time * 1.3 + w.userData.k) * Math.sin(time * 0.37 + w.userData.k * 2); });
+
+    var p = sp.geometry.attributes.position.array;
+    for (var i = 0; i < N; i++) {
+      p[i * 3 + 1] += spV[i] * dt; p[i * 3] += Math.sin(time * 0.25 + spS[i]) * 1.2 * dt;
+      if (p[i * 3 + 1] > 115) { p[i * 3 + 1] = -5; p[i * 3] = rnd(-160, 160); p[i * 3 + 2] = rnd(-150, 30); }
+    }
+    sp.geometry.attributes.position.needsUpdate = true;
+
+    nextStreak -= dt; if (nextStreak <= 0) { launchStreak(); nextStreak = rnd(3, 7); }
+    streaks.forEach(function (s) {
+      var u = s.userData; if (u.t < 0) return;
+      u.t += dt; var f = u.t / u.dur;
+      if (f >= 1) { u.t = -1; s.material.opacity = 0; return; }
+      s.position.set(u.x + u.vx * u.t, u.y + u.vy * u.t, -380);
+      s.material.opacity = Math.sin(f * Math.PI);
+    });
+    renderer.render(scene, camera);
+  }
+  loop();
+  return true;
+}
+  var videoOk = false;
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function playVideo() {}
+  try { videoOk = startNight3D(); } catch (e) { videoOk = false; }
+  if (videoOk) $("stage").classList.add("has-video");
+
+  /* ----- Rideau de transition ----- */
+  async function wipe(id, color) {
+    var w = $("wipe");
+    w.style.setProperty("--wc", color || "#e8b64a");
+    w.classList.remove("go");
+    void w.offsetWidth;
+    w.classList.add("go");
+    snd("whoosh");
+    await sleep(480, id); /* l'écran est couvert : on peut changer le décor */
+  }
+
+  /* ----- Séquences ----- */
+  async function leader(id) {
+    setStatus("Départ");
+    show("leader");
+    var nums = [3, 2, 1];
+    for (var i = 0; i < nums.length; i++) {
+      $("count").textContent = nums[i];
+      snd("tick");
+      await sleep(850, id);
+    }
+    show("");
+    await sleep(500, id);
+  }
+
+  async function recap(id) {
+    setStatus("Précédemment");
+    $("rcLabel").classList.remove("shown");
+    $("rcText").classList.remove("shown");
+    reflow();
+    show("recap");
+    await sleep(300, id);
+    $("rcLabel").classList.add("shown");
+    await sleep(400, id);
+    $("rcText").classList.add("shown");
+    snd("swell");
+    await sleep(2800, id);
+    show("");
+    await sleep(400, id);
+  }
+
+  /* ----- Mur de commentaires (captures Teams) ----- */
+  var CARD_COLORS = ["#5b5fc7", "#c4314b", "#038387", "#8764b8", "#ca5010", "#4f6bed"];
+  var placed = [], zTop = 0, shownCount = 0, wallEpoch = 0;
+
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = a[i];
+      a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function initials(n) {
+    return n.split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0).toUpperCase(); }).join("");
+  }
+  function makeCard(c) {
+    var el = document.createElement("div");
+    el.className = "shot";
+    var card = document.createElement("div");
+    card.className = "card";
+    card.style.setProperty("--fd", rand(4.5, 8).toFixed(1) + "s");
+    card.style.setProperty("--fdel", (-rand(0, 4)).toFixed(1) + "s");
+    if (c.img) {
+      card.classList.add("img");
+      var im = new Image();
+      im.alt = "Commentaire d'une équipe sur Teams";
+      im.src = c.img;
+      card.appendChild(im);
+    } else {
+      card.classList.add("mock");
+      var h = 0;
+      for (var i = 0; i < c.who.length; i++) h += c.who.charCodeAt(i);
+      card.innerHTML = '<div class="av"></div><div class="bd"><div class="hd"><b></b><span></span></div><div class="tx"></div></div>';
+      var av = card.querySelector(".av");
+      av.textContent = initials(c.who);
+      av.style.setProperty("--av", CARD_COLORS[h % CARD_COLORS.length]);
+      card.querySelector("b").textContent = c.who;
+      card.querySelector(".hd span").textContent = c.time || "";
+      card.querySelector(".tx").textContent = c.text;
+      (c.emoji || []).forEach(function (k) {
+        if (!EMO[k]) return;
+        var e = new Image();
+        e.className = "emo"; e.alt = ""; e.src = EMO[k];
+        card.querySelector(".tx").appendChild(e);
+      });
+    }
+    el.appendChild(card);
+    if (c.team) {
+      var tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = c.team;
+      el.appendChild(tag);
+    }
+    return el;
+  }
+  function overlap(a, b) {
+    var w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+    var h = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+    return w > 0 && h > 0 ? w * h : 0;
+  }
+  function dropCard(p) {
+    p.el.classList.remove("in");
+    p.el.classList.add("out");
+    setTimeout(function () { if (p.el.parentNode) p.el.parentNode.removeChild(p.el); }, 500);
+  }
+  function clearWall() {
+    $("wall").textContent = "";
+    placed = []; zTop = 0; shownCount = 0; wallEpoch++;
+    $("cNum").textContent = "0";
+    $("cLbl").textContent = "commentaire";
+  }
+
+  async function addComment(c) {
+    var wall = $("wall"), el = makeCard(c), ep = wallEpoch;
+    el.style.visibility = "hidden";
+    wall.appendChild(el);
+    var img = el.querySelector("img");
+    if (img && !img.complete) {
+      await new Promise(function (res) { img.onload = res; img.onerror = res; });
+    }
+    var W = wall.clientWidth, H = wall.clientHeight, w = el.offsetWidth, h = el.offsetHeight;
+    var PAD = 18, pos = null, dropped = false; /* marge qui absorbe l'inclinaison et le flottement */
+    function free(cd) {
+      return placed.every(function (p) {
+        return cd.x + cd.w + PAD <= p.x || p.x + p.w + PAD <= cd.x || cd.y + cd.h + PAD <= p.y || p.y + p.h + PAD <= cd.y;
+      });
+    }
+    /* On cherche une place libre : au hasard d'abord, puis en balayant le mur.
+       S'il n'y en a plus, le plus ancien commentaire s'efface pour laisser la place. */
+    while (!pos) {
+      for (var k = 0; k < 80 && !pos; k++) {
+        var cd = { x: Math.random() * Math.max(0, W - w), y: 12 + Math.random() * Math.max(0, H - h - 12), w: w, h: h };
+        if (free(cd)) pos = cd;
+      }
+      for (var yy = 12; yy <= Math.max(12, H - h) && !pos; yy += 20) {
+        for (var xx = 0; xx <= Math.max(0, W - w) && !pos; xx += 20) {
+          var c2 = { x: xx, y: yy, w: w, h: h };
+          if (free(c2)) pos = c2;
+        }
+      }
+      if (!pos) {
+        if (placed.length) { dropCard(placed.shift()); dropped = true; }
+        else pos = { x: 0, y: 12, w: w, h: h };
+      }
+    }
+    if (dropped) {
+      await new Promise(function (res) { setTimeout(res, 320); });
+      if (ep !== wallEpoch) return;
+    }
+    el.style.left = pos.x + "px";
+    el.style.top = pos.y + "px";
+    el.style.setProperty("--rot", (Math.random() * 8 - 4).toFixed(1) + "deg");
+    el.style.zIndex = String(++zTop);
+    el.style.visibility = "";
+    placed.push({ el: el, x: pos.x, y: pos.y, w: w, h: h });
+    reflow();
+    el.classList.add("in");
+    shownCount++;
+    $("cNum").textContent = String(shownCount);
+    $("cLbl").textContent = shownCount > 1 ? "commentaires" : "commentaire";
+    var ct = $("counter");
+    ct.classList.remove("bump");
+    void ct.offsetWidth;
+    ct.classList.add("bump");
+  }
+
+  /* ----- Épisode ----- */
+  async function game(i, id) {
+    var g = GAMES[i], sc = scenes.game;
+    var list = (g.comments || []).slice();
+    var steps = list.map(function (c) { return Math.min(4200, 1100 + (c.text ? c.text.length : 0) * 22); });
+    var stepsTotal = steps.reduce(function (a, b) { return a + b; }, 0);
+    var total = (480 + 300 + 1100 + 600 + stepsTotal) / 1000;
+
+    var photoOk = g.photo ? await loadImage(g.photo) : false;
+    if (id !== token) throw CANCEL;
+
+    await wipe(id, g.tint);
+
+    /* Changement de décor pendant que le rideau couvre l'écran */
+    sc.classList.add("reset");
+    sc.style.setProperty("--tint", g.tint);
+    var photo = $("photo");
+    photo.className = "photo";
+    var wrap = sc.querySelector(".photo-wrap");
+    wrap.style.background = "";
+    if (photoOk) {
+      photo.style.backgroundImage = 'url("' + g.photo + '")';
+      $("phLabel").hidden = true;
+    } else if (videoOk) {
+      /* Pas de photo pour ce thème : la vidéo de fond reste visible */
+      photo.style.backgroundImage = "";
+      wrap.style.background = "transparent";
+      $("phLabel").hidden = true;
+    } else {
+      photo.style.backgroundImage = "";
+      photo.classList.add("ph");
+      $("phLabel").hidden = false;
+    }
+    var x0 = rand(-3, 3), y0 = rand(-2, 2);
+    photo.style.setProperty("--x0", x0.toFixed(1) + "%");
+    photo.style.setProperty("--y0", y0.toFixed(1) + "%");
+    photo.style.setProperty("--x1", ((x0 > 0 ? -1 : 1) * rand(1, 3)).toFixed(1) + "%");
+    photo.style.setProperty("--y1", ((y0 > 0 ? -1 : 1) * rand(0.5, 2)).toFixed(1) + "%");
+    photo.style.setProperty("--kb-dur", (total + 1.5).toFixed(1) + "s");
+    $("epTitle").classList.remove("shown");
+    $("lower").classList.remove("shown");
+    clearWall();
+    $("epNum").textContent = "Épisode " + (i + 1) + " / " + GAMES.length;
+    splitWords($("epTitle"), g.theme);
+    var hasAnn = !!(g.announcer || g.message);
+    $("ltGame").textContent = g.announcer || "";
+    $("ltMsg").textContent = g.message ? "« " + g.message + " »" : "";
+    $("lt").hidden = !hasAnn;
+    $("counter").hidden = !list.length;
+    $("lower").hidden = !hasAnn && !list.length;
+    setStatus("Épisode " + (i + 1) + " / " + GAMES.length);
+    $("btnNext").disabled = true;
+    $("btnNext").classList.remove("ready");
+    $("btnNext").textContent = i < GAMES.length - 1 ? "Thème suivant" : "Aller à la fin";
+    segs[i].style.setProperty("--dur", total.toFixed(1) + "s");
+    segs[i].classList.add("now");
+    show("game");
+    reflow();
+    sc.classList.remove("reset");
+    reflow();
+    photo.classList.add("go");
+
+    await sleep(300, id);
+    $("epTitle").classList.add("shown");
+    snd("boom");
+    await sleep(1100, id);
+    $("lower").classList.add("shown");
+    await sleep(600, id);
+    for (var k = 0; k < list.length; k++) {
+      await addComment(list[k]);
+      snd("pop");
+      await sleep(steps[k], id);
+    }
+    if (!list.length) await sleep(1500, id);
+    var bn = $("btnNext");
+    bn.disabled = false;
+    bn.classList.add("ready");
+    setStatus("Épisode " + (i + 1) + " / " + GAMES.length + " · à vous de continuer");
+    await waitNext(id);
+    segs[i].classList.remove("now");
+    segs[i].classList.add("done");
+  }
+
+  async function finale(id) {
+    setMode("end");
+    setStatus("Fin de l'intro");
+    segs.forEach(function (s) { s.classList.remove("now"); s.classList.add("done"); });
+    scenes.end.style.setProperty("--tint", NEW_GAME.tint);
+    ["endEyebrow", "endName", "endLock", "endRules", "endActions", "endTitle"].forEach(function (k) { $(k).classList.remove("shown"); });
+    $("endEyebrow").textContent = NEW_GAME.eyebrow;
+    $("endName").textContent = NEW_GAME.name;
+    splitTitle($("endTitle"), NEW_GAME.label);
+    reflow();
+    await wipe(id, NEW_GAME.tint);
+    show("end");
+    await sleep(600, id);
+    $("endEyebrow").classList.add("shown");
+    await sleep(900, id);
+    flash();
+    snd("boom");
+    $("endTitle").classList.add("shown");
+    await sleep(1100, id);
+    $("endName").classList.add("shown");
+    await sleep(700, id);
+    $("endLock").classList.add("shown");
+    await sleep(600, id);
+    $("endRules").classList.add("shown");
+    await sleep(RULES.length * 140 + 700, id);
+    $("endActions").classList.add("shown");
+    droneOff();
+  }
+
+  async function revealTheme() {
+    var id = ++token;
+    setStatus("Nouveau thème");
+    scenes.theme.style.setProperty("--tint", NEW_THEME.tint);
+    ["thLabel", "thActions", "thTitle"].forEach(function (k) { $(k).classList.remove("shown"); });
+    splitTitle($("thTitle"), NEW_THEME.theme);
+    reflow();
+    try {
+      await wipe(id, NEW_THEME.tint);
+      show("theme");
+      await sleep(500, id);
+      $("thLabel").classList.add("shown");
+      await sleep(700, id);
+      flash();
+      snd("boom");
+      $("thTitle").classList.add("shown");
+      await sleep(1600, id);
+      snd("ding");
+      $("thActions").classList.add("shown");
+    } catch (e) { if (e !== CANCEL) console.error(e); }
+  }
+  function backToEnd() {
+    ++token;
+    setStatus("Fin de l'intro");
+    show("end");
+  }
+
+  async function start() {
+    var id = ++token;
+    resetProgress();
+    setMode("play");
+    audioInit();
+    droneOn();
+    playVideo();
+    curEp = -1;
+    nextResolve = null;
+    $("btnNext").disabled = true;
+    $("btnNext").classList.remove("ready");
+    $("btnNext").textContent = "Thème suivant";
+    try {
+      await leader(id);
+      await recap(id);
+      for (var i = 0; i < GAMES.length; i++) { curEp = i; await game(i, id); }
+      await finale(id);
+    } catch (e) { if (e !== CANCEL) console.error(e); }
+  }
+
+  /* Bouton « Thème suivant » : actif seulement quand tous les commentaires du thème sont passés.
+     Le thème reste à l'écran jusqu'au clic. */
+  var nextResolve = null;
+  function waitNext(id) {
+    return new Promise(function (res, rej) {
+      nextResolve = function () { nextResolve = null; if (id === token) res(); else rej(CANCEL); };
+    });
+  }
+  function nextTheme() {
+    var b = $("btnNext");
+    if (body.dataset.mode !== "play" || b.disabled || !nextResolve) return;
+    b.disabled = true;
+    b.classList.remove("ready");
+    nextResolve();
+  }
+
+
+  /* ----- Commandes ----- */
+  $("btnStart").addEventListener("click", start);
+  $("btnReplay").addEventListener("click", start);
+  var confirmTimer = null;
+  function resetReveal() {
+    var b = $("btnTheme");
+    b.classList.remove("confirm");
+    b.textContent = "Révéler le thème";
+  }
+  $("btnTheme").addEventListener("click", function () {
+    if (!this.classList.contains("confirm")) {
+      this.classList.add("confirm");
+      this.textContent = "Confirmer : le quiz est terminé";
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(resetReveal, 5000);
+      return;
+    }
+    clearTimeout(confirmTimer);
+    resetReveal();
+    revealTheme();
+  });
+  $("btnBack").addEventListener("click", backToEnd);
+  $("btnNext").addEventListener("click", nextTheme);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" && body.dataset.mode === "play") nextTheme();
+  });
+
+
+  /* ----- Transition vers le quiz : 10 secondes, le village se déforme, vire à la rouille, puis disparaît ----- */
+  var shRunning = false, SH_TOTAL = 10;
+  function goQuiz() { window.location.href = "quiz.html"; }
+  /* image-clé : [temps, gris, sépia, teinte, saturation, luminosité, contraste, flou px, déformation, brouillard, cendre, bruit, rouge, vignette, noir, zoom] */
+  var SH_KEYS = [
+    [0,    0,   0,   0,   1,   1,    1,    0, 0,  0,    0,   0,    0,    0,    0, 1],
+    [1.5,  0,   0,   0,   1,   0.9,  1.05, 0, 0,  0.25, 0.3, 0.05, 0,    0.1,  0, 1],
+    [1.6,  0,   0,   0,   1,   0.3,  1.1,  0, 3,  0.28, 0.3, 0.1,  0,    0.1,  0, 1],
+    [1.8,  0,   0,   0,   1,   0.85, 1.1,  0, 3,  0.3,  0.35, 0.1, 0,    0.15, 0, 1],
+    [4.0,  0.6, 0,   0,   0.7, 0.7,  1.2,  0, 12, 0.6,  0.7, 0.18, 0,    0.35, 0, 1.02],
+    [4.12, 0.6, 0,   0,   0.7, 0.04, 1.2,  0, 12, 0.6,  0.7, 0.3,  0,    0.5,  0, 1.02],
+    [4.4,  0,   0.9, -28, 2.3, 0.85, 1.2,  0, 24, 0.7,  0.85, 0.25, 0.4, 0.4,  0, 1.03],
+    [7.0,  0,   0.9, -36, 2.6, 0.6,  1.3,  1, 36, 0.88, 1,   0.35, 0.7,  0.6,  0, 1.06],
+    [7.35, 0,   0.9, -36, 2.6, 2.2,  0.8,  1, 36, 0.9,  1,   0.4,  0.7,  0.6,  0, 1.06],
+    [7.55, 1,   0,   0,   1,   0.55, 1.5,  1, 30, 0.9,  1,   0.35, 0,    0.65, 0, 1.06],
+    [9.0,  1,   0,   0,   1,   0.28, 1.5,  2, 30, 0.95, 1,   0.35, 0,    0.85, 0, 1.08],
+    [10,   1,   0,   0,   1,   0.04, 1.5,  3, 30, 1,    1,   0.35, 0,    1,    1, 1.1]
+  ];
+  function shParams(t) {
+    var k = SH_KEYS, i = 0;
+    while (i < k.length - 2 && t > k[i + 1][0]) i++;
+    var a = k[i], b = k[i + 1], f = Math.max(0, Math.min(1, (t - a[0]) / (b[0] - a[0]))), o = [];
+    for (var n = 0; n < a.length; n++) o.push(a[n] + (b[n] - a[n]) * f);
+    return o;
+  }
+  /* la silhouette qui s'approche, par éclairs : [début, fin, position %, échelle] */
+  var SH_FIG = [[5.2, 5.34, 74, 0.7], [6.0, 6.12, 71, 0.85], [6.6, 6.7, 69, 1.0], [7.1, 7.28, 66, 1.3], [8.3, 8.72, 58, 1.75], [9.35, 9.6, 50, 2.3]];
+  var SH_JOLT = [0.9, 1.5, 2.4, 3.1, 3.7, 4.0, 4.5, 4.9, 5.3, 5.8, 6.2, 6.5, 6.9, 7.3, 7.5, 8.0, 8.4, 8.8, 9.1, 9.5];
+
+  function shTransition() {
+    if (shRunning) return; shRunning = true;
+    var fx = $("shFx"), stage = $("stage"), cv = $("shAsh"), g = cv.getContext("2d"), W = innerWidth, H = innerHeight, dpr = Math.min(devicePixelRatio || 1, 2);
+    var fog = fx.querySelector(".sh-fog"), noise = fx.querySelector(".sh-noise"), red = fx.querySelector(".sh-red"), vig = fx.querySelector(".sh-vig"), blk = fx.querySelector(".sh-black"), fig = fx.querySelector(".sh-figure");
+    var turb = $("shTurb"), disp = $("shDisp");
+    cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    fx.hidden = false;
+    var flakes = [], i;
+    for (i = 0; i < 220; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: 0.8 + Math.random() * 2.6, vy: 22 + Math.random() * 70, vx: -8 + Math.random() * 16, p: Math.random() * 6, a: 0.25 + Math.random() * 0.6, e: Math.random() < 0.4 });
+    var t0 = performance.now(), last = t0, raf, done = false, jolt = 0;
+    function finish() { if (done) return; done = true; cancelAnimationFrame(raf); goQuiz(); }
+    function beat(t) { var p = (t % 1.1) / 1.1; return Math.exp(-Math.pow((p - 0.08) * 14, 2)) + 0.7 * Math.exp(-Math.pow((p - 0.28) * 14, 2)); }
+    function frame(now) {
+      var t = (now - t0) / 1000, dt = Math.min(0.05, (now - last) / 1000); last = now;
+      if (t >= SH_TOTAL) { finish(); return; }
+      var P = shParams(t);
+      /* le monde : couleurs, flou, déformation */
+      var warp = P[8];
+      turb.setAttribute("baseFrequency", (0.006 + 0.003 * Math.sin(t * 0.9)).toFixed(4) + " " + (0.010 + 0.005 * Math.cos(t * 0.7)).toFixed(4));
+      disp.setAttribute("scale", warp.toFixed(1));
+      stage.style.filter = (warp > 0.5 ? "url(#shWarp) " : "") + "sepia(" + P[2].toFixed(2) + ") saturate(" + P[4].toFixed(2) + ") hue-rotate(" + P[3].toFixed(0) + "deg) grayscale(" + P[1].toFixed(2) + ") brightness(" + P[5].toFixed(2) + ") contrast(" + P[6].toFixed(2) + ")" + (P[7] > 0.05 ? " blur(" + P[7].toFixed(1) + "px)" : "");
+      stage.style.transform = "scale(" + P[15].toFixed(3) + ")";
+      fog.style.opacity = P[9].toFixed(2); cv.style.opacity = P[10].toFixed(2); noise.style.opacity = P[11].toFixed(2);
+      red.style.opacity = (P[12] * (0.5 + 0.7 * beat(t))).toFixed(2);
+      vig.style.opacity = P[13].toFixed(2); blk.style.opacity = P[14].toFixed(2);
+      /* la silhouette */
+      var vis = false;
+      for (var q = 0; q < SH_FIG.length; q++) { var F = SH_FIG[q]; if (t >= F[0] && t <= F[1]) { fig.style.left = F[2] + "%"; fig.style.transform = "scale(" + F[3] + ")"; fig.style.opacity = "0.92"; vis = true; } }
+      if (!vis) fig.style.opacity = "0";
+      /* secousses et déchirures d'écran */
+      if (jolt < SH_JOLT.length && t >= SH_JOLT[jolt]) {
+        jolt++;
+        var amp = 4 + 10 * (t / SH_TOTAL);
+        stage.style.setProperty("--sx", (Math.random() * amp * 2 - amp).toFixed(1) + "px");
+        stage.style.setProperty("--sy", (Math.random() * amp - amp / 2).toFixed(1) + "px");
+        stage.classList.add("sh-shake");
+        var bars = [], nb = 3 + Math.round(3 * (t / SH_TOTAL));
+        for (var b = 0; b < nb; b++) {
+          var d = document.createElement("div"); d.className = "sh-tear";
+          d.style.top = (Math.random() * 94).toFixed(1) + "%"; d.style.height = (2 + Math.random() * 22).toFixed(0) + "px"; fx.appendChild(d); bars.push(d);
+        }
+        setTimeout(function () { stage.classList.remove("sh-shake"); bars.forEach(function (x) { x.remove(); }); }, 120);
+      }
+      /* cendre : grise, puis braises orangées dans le monde rouille */
+      g.clearRect(0, 0, W, H);
+      var ember = t > 4.4 && t < 7.4, col = ember ? "255,150,70" : "226,226,226";
+      for (var k = 0; k < flakes.length; k++) {
+        var f = flakes[k];
+        f.y += f.vy * dt * (1 + t / 8); f.x += (f.vx + Math.sin(now / 900 + f.p) * 14) * dt;
+        if (f.y > H + 6) { f.y = -6; f.x = Math.random() * W; }
+        g.fillStyle = "rgba(" + col + "," + f.a + ")";
+        g.beginPath();
+        if (f.e) g.ellipse(f.x, f.y, f.r * 1.8, f.r * 0.8, f.p, 0, 7); else g.arc(f.x, f.y, f.r, 0, 7);
+        g.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    setTimeout(finish, (SH_TOTAL + 0.4) * 1000);
+    fx.addEventListener("click", finish);   /* un clic pour passer */
+  }
+  $("btnQuiz").addEventListener("click", function (e) {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    if (reduceMotion) { goQuiz(); return; }
+    try { shTransition(); } catch (err) { goQuiz(); }
+  });
+
+  setMode("idle");
+})();
+</script>
+</body>
+</html>
