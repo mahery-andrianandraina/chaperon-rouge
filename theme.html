@@ -42,6 +42,7 @@ video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: con
 .btn { min-height: 48px; padding: 0 24px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 2px; background: rgba(255, 255, 255, 0.18); color: #fff; cursor: pointer; font: 400 0.85rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; backdrop-filter: blur(4px); }
 .btn:hover, .btn:focus-visible { background: rgba(255, 255, 255, 0.34); outline: none; }
 .hide { display: none; }
+a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 body.done .frame { display: none; }
 @media (prefers-reduced-motion: reduce) { .sky, .sky::before, .dots i, .play { animation: none; } .theme span { animation-duration: 0.01s; animation-delay: 0s; } }
 </style>
@@ -62,6 +63,7 @@ body.done .frame { display: none; }
     </div>
     <h1 class="theme" id="theme" hidden></h1>
     <button class="btn" id="again" type="button" hidden>Revoir la vidéo</button>
+    <a class="btn" id="board" href="leaderboard.html" hidden>Voir le classement</a>
   </section>
 </main>
 <script>
@@ -95,7 +97,7 @@ var DEFAULT_THEME = "Lobaka fotsy + Jean Bleu + Tennis Fotsy";
       h.appendChild(word); h.appendChild(document.createTextNode(" "));
     });
     h.setAttribute("aria-label", THEME);
-    $("again").hidden = !ready;
+    $("again").hidden = !ready; $("board").hidden = false;
   }
   function enable() { if (ready) return; ready = true; play.disabled = false; $("state").textContent = "Vidéo prête  ·  appuyez pour lancer"; $("barWrap").style.display = "none"; }
   function fail() { if (started) return; ready = false; $("barWrap").style.display = "none"; showTheme(); }
