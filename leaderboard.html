@@ -58,6 +58,10 @@ tr.me td.nm::after { content: "  · vous"; font: 400 0.7rem/1 var(--f-ui); lette
 @media (max-width: 620px) { .pod .n { font-size: 1.05rem; } th.ou, td.ou { display: none; } main { padding-top: 64px; } }
 @media (prefers-reduced-motion: reduce) { .live i { animation: none; } }
 </style>
+<script>
+/* Lien de déploiement Google Apps Script (Google Sheet des scores) */
+window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbyOh1xg06PP-DiouksFKseJsXKi9TPn9F7EL4V-Mqb3ZdKlCQQ7ZxEfqytNUr3sxq4J/exec" };
+</script>
 </head>
 <body>
 <div class="bg" aria-hidden="true"></div>
@@ -109,31 +113,28 @@ tr.me td.nm::after { content: "  · vous"; font: 400 0.7rem/1 var(--f-ui); lette
     });
   }
 
-  function offline() {
+  function offline(msg) {
     if (loaded) return;
-    $("liveTxt").textContent = "Classement partagé indisponible";
+    $("liveTxt").textContent = msg || "Classement indisponible";
     var mine = null; try { mine = JSON.parse(localStorage.getItem("cpr_best") || "null"); } catch (e) {}
     $("note").hidden = false;
-    $("note").textContent = "Le classement commun s'affiche seulement dans la page partagée, une fois connecté. Ouvrez le lien du quiz envoyé par l'organisateur.";
-    if (mine) render([{ id: "me", name: mine.name, score: mine.score, total: mine.total, ms: mine.ms, outcome: mine.outcome, at: mine.at }]), myId = "me", $("note").hidden = false;
+    $("note").textContent = "Le classement des joueurs n'a pas pu être chargé. Réessayez dans un instant.";
+    if (mine) { myId = "me"; render([{ id: "me", name: mine.name, score: mine.score, total: mine.total, ms: mine.ms, outcome: mine.outcome, at: mine.at }]); $("liveTxt").textContent = "Classement indisponible  ·  votre meilleur résultat"; $("note").hidden = false; }
   }
 
-  /* classement partagé : une ligne par joueur, mise à jour en direct */
-  var timer = setTimeout(offline, 10000);
-  if (!(window.claude && claude.use)) { clearTimeout(timer); offline(); return; }
-  Promise.all([claude.use("db"), claude.use("user")]).then(function (r) {
-    var db = r[0], user = r[1];
-    if (!db) { clearTimeout(timer); offline(); return; }
-    var go = function () {
-      db.collection("scores").onSnapshot(function (snap) {
-        clearTimeout(timer);
-        var arr = snap && snap.docs ? snap.docs : (Array.isArray(snap) ? snap : []), out = [];
-        arr.forEach(function (d) { var v = typeof d.data === "function" ? d.data() : d; if (v && typeof v.score === "number") { v.id = d.id || v.id; out.push(v); } });
-        render(out);
-      }, function () { clearTimeout(timer); offline(); });
-    };
-    if (user && user.id) user.id().then(function (id) { myId = id; go(); }, go); else go();
-  }, function () { clearTimeout(timer); offline(); });
+  /* Le classement est lu dans le Google Sheet (application web Apps Script), puis actualisé toutes les 15 secondes. */
+  try { myId = localStorage.getItem("cpr_pid"); } catch (e) {}
+  var URL_ = window.CPR_CONFIG && CPR_CONFIG.SCORES_URL;
+  if (!URL_) { $("liveTxt").textContent = "Classement non connecté"; $("note").hidden = false; $("note").textContent = "L'adresse du Google Sheet n'est pas encore renseignée."; offline("Classement non connecté"); return; }
+  function pull() {
+    var ctrl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctrl) ctrl.abort(); }, 12000);
+    fetch(URL_ + (URL_.indexOf("?") < 0 ? "?" : "&") + "t=" + Date.now(), ctrl ? { signal: ctrl.signal } : {}).then(function (r) { return r.json(); }).then(function (j) {
+      clearTimeout(to);
+      if (!j || !j.ok || !Array.isArray(j.rows)) throw new Error("bad");
+      render(j.rows.filter(function (v) { return v && typeof v.score === "number" && !isNaN(v.score); }));
+    }).catch(function () { clearTimeout(to); if (!loaded) offline(); });
+  }
+  pull(); setInterval(function () { if (!document.hidden) pull(); }, 15000);
 })();
 </script>
 </body>
