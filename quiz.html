@@ -25,9 +25,20 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--paper
 @keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); } 60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); } }
 
 /* Ligne de temps : une fine ligne de lumière qui se consume */
-.tl { position: fixed; z-index: 6; left: 0; right: 0; top: 0; height: 3px; background: rgba(255, 255, 255, 0.08); opacity: 0; transition: opacity 0.4s; }
+.tl { position: fixed; z-index: 6; left: 0; right: 0; top: 0; height: 7px; background: rgba(255, 255, 255, 0.08); opacity: 0; transition: opacity 0.4s; }
 .tl.on { opacity: 1; }
-.tl i { position: absolute; inset: 0; background: #f2f2f2; transform-origin: left; box-shadow: 0 0 14px rgba(255, 255, 255, 0.8); }
+.tl i { position: absolute; inset: 0; background: #f2f2f2; transform-origin: left; box-shadow: 0 0 14px rgba(255, 255, 255, 0.8); transition: background 0.5s, box-shadow 0.5s; }
+.tl.warm i { background: #ffc94a; box-shadow: 0 0 18px rgba(255, 190, 50, 0.9); }
+.tl.hot i { background: #ff3b2e; box-shadow: 0 0 26px rgba(255, 50, 40, 1); }
+/* Chrono bien visible : grand nombre qui change de couleur et palpite */
+#secs { font: italic 400 clamp(2.4rem, 5.8vw, 4.2rem)/1 var(--f-title); letter-spacing: 0.02em; min-width: 3.2ch; text-align: right; color: #f2f2f2; text-shadow: 0 0 22px rgba(255, 255, 255, 0.35); text-transform: none; align-self: flex-end; transform-origin: 100% 100%; font-variant-numeric: lining-nums tabular-nums; transition: color 0.4s, text-shadow 0.4s; }
+#secs.warm { color: #ffc94a; text-shadow: 0 0 26px rgba(255, 190, 50, 0.6); }
+#secs.hot { color: #ff4a3c; text-shadow: 0 0 30px rgba(255, 50, 40, 0.8); animation: throb var(--bt, 0.6s) ease-in-out infinite; }
+@keyframes throb { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.22); } 28% { transform: scale(1); } 42% { transform: scale(1.14); } 60% { transform: scale(1); } }
+/* Battement de cœur : liseré rouge qui pulse de plus en plus vite quand le temps s'épuise */
+.beat { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: var(--bi, 0); transition: opacity 0.6s; }
+.beat i { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 38%, rgba(170, 0, 0, 0.55) 78%, rgba(120, 0, 0, 0.9) 100%); animation: lubdub var(--bt, 1s) ease-in-out infinite; opacity: 0; }
+@keyframes lubdub { 0% { opacity: 0.05; } 12% { opacity: 1; } 24% { opacity: 0.2; } 36% { opacity: 0.8; } 55%, 100% { opacity: 0.05; } }
 .tl.low i { animation: flick 0.5s steps(2) infinite; }
 @keyframes flick { 50% { opacity: 0.35; } }
 
@@ -55,6 +66,14 @@ main { position: relative; z-index: 5; height: 100%; overflow-y: auto; display: 
 .opts button.right .l { border-color: #0a0a0a; }
 .opts button.wrong { opacity: 0.55; text-decoration: line-through; text-decoration-thickness: 1px; border-style: dashed; }
 .opts button.dim { opacity: 0.25; }
+.opts button.off { opacity: 0.16; text-decoration: line-through; text-decoration-thickness: 1px; border-style: dashed; cursor: default; }
+.joker { justify-self: start; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; min-height: 52px; padding: 10px 20px; cursor: pointer; background: rgba(255, 214, 80, 0.10); border: 1px solid rgba(255, 214, 80, 0.6); border-radius: 2px; color: #ffe7a0; font: 500 0.82rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; box-shadow: 0 0 22px rgba(255, 200, 60, 0.18); transition: background 0.2s, box-shadow 0.2s; }
+.joker small { font: 400 0.68rem/1.2 var(--f-ui); letter-spacing: 0.08em; text-transform: none; color: #cbb978; }
+.joker:hover, .joker:focus-visible { background: rgba(255, 214, 80, 0.2); box-shadow: 0 0 34px rgba(255, 200, 60, 0.4); outline: none; }
+.joker[hidden] { display: none; }
+.joker.hot { animation: jpulse 1.1s ease-in-out infinite; border-color: #ffd650; color: #fff3c4; }
+.joker.hot small { color: #ffe7a0; }
+@keyframes jpulse { 0%, 100% { background: rgba(255, 214, 80, 0.10); box-shadow: 0 0 18px rgba(255, 200, 60, 0.2); } 50% { background: rgba(255, 214, 80, 0.30); box-shadow: 0 0 46px rgba(255, 210, 70, 0.85); } }
 .msg { margin: 0; min-height: 1.5em; font: italic 400 1.25rem/1.4 var(--f-title); color: #f2f2f2; }
 .score { font: italic 400 clamp(4.5rem, 16vw, 9rem)/1 var(--f-title); color: #f6f6f6; text-shadow: 0 0 40px rgba(255, 255, 255, 0.35); }
 .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 6px; }
@@ -70,7 +89,7 @@ main { position: relative; z-index: 5; height: 100%; overflow-y: auto; display: 
 @keyframes emerge { to { opacity: 1; filter: blur(0); transform: none; } }
 
 @media (max-width: 760px) { .opts { grid-template-columns: minmax(0, 1fr); } .shade { background: linear-gradient(180deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.6)); } }
-@media (prefers-reduced-motion: reduce) { .grain, .tl.low i { animation: none; } .reveal-title span { animation-duration: 0.01s; animation-delay: 0s; } }
+@media (prefers-reduced-motion: reduce) { .grain, .tl.low i, .joker.hot, #secs.hot, .beat i { animation: none; } .reveal-title span { animation-duration: 0.01s; animation-delay: 0s; } }
 
 body.dawn .shade { opacity: 0; transition: opacity 3s ease 1s; }
 body.dawn .vig { opacity: 0.25; transition: opacity 5s ease 1s; }
@@ -95,6 +114,16 @@ body.cinema .cine .bar { height: 13vh; }
 .cine .ttl b { font: italic 400 clamp(2.4rem, 8.6vw, 7rem)/1.05 var(--f-title); color: #f6f6f6; text-shadow: 0 0 50px rgba(255, 255, 255, 0.25); letter-spacing: 0.01em; }
 .cine .ttl b em { color: #d3231d; font-style: italic; text-shadow: 0 0 40px rgba(210, 30, 30, 0.6); }
 .cine .ttl small { font: 400 0.8rem/1 var(--f-ui); letter-spacing: 0.4em; text-transform: uppercase; color: #bdbdbd; }
+.cine .crawl { position: absolute; inset: 0; overflow: hidden; perspective: 520px; perspective-origin: 50% 70%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 12%, #000 26%, #000 72%, transparent 86%); mask-image: linear-gradient(to bottom, transparent 12%, #000 26%, #000 72%, transparent 86%); transition: opacity 2s ease; }
+.cine .crawl.out { opacity: 0; }
+.cine .crawl-in { position: absolute; left: 50%; top: 0; width: min(900px, 88vw); margin-left: calc(min(900px, 88vw) / -2); text-align: center; transform-origin: 50% 100%; will-change: transform;
+  font: italic 400 clamp(1.5rem, 3.7vw, 2.7rem)/1.55 var(--f-title); color: #f2f2f2; text-shadow: 0 2px 18px #000; text-wrap: balance; transform: translate3d(0, 110vh, 0) rotateX(9deg); }
+.cine .crawl-in p { margin: 0 0 2.2em; }
+.cine .crawl-in .k { font: 400 0.8rem/1.4 var(--f-ui); letter-spacing: 0.38em; text-transform: uppercase; color: #a9a9a9; font-style: normal; }
+.cine .crawl-in .last { font-size: 1.25em; color: #fff3c4; text-shadow: 0 0 26px rgba(255, 214, 80, 0.55), 0 2px 18px #000; }
+.cine .crawl-in .ttl { position: static; inset: auto; opacity: 1; transition: none; display: grid; justify-items: center; place-content: normal; gap: 14px; margin-top: 7vh; padding-bottom: 6vh; font-style: normal; }
+.cine .crawl.fixed { -webkit-mask-image: none; mask-image: none; perspective: none; }
 .cine .nm { display: grid; gap: 8px; width: min(22rem, 80vw); margin-top: 22px; text-align: left; }
 .cine .nm span { font: 400 0.72rem/1.3 var(--f-ui); letter-spacing: 0.28em; text-transform: uppercase; color: #a9a9a9; }
 .cine .nm input { min-height: 48px; padding: 0 4px; background: transparent; border: 0; border-bottom: 1px solid rgba(233, 233, 233, 0.35); color: #f2f2f2; font: 400 1.2rem/1 var(--f-ui); letter-spacing: 0.04em; border-radius: 0; text-align: center; text-shadow: 0 2px 12px #000; }
@@ -121,8 +150,8 @@ body.cinema #bg { transform: scale(1.1); }
 <canvas id="bg" aria-hidden="true"></canvas>
 <div id="arrive" aria-hidden="true"><div class="af"></div></div>
 <div class="cine" id="cine" aria-label="Annonce du jeu">
+  <div class="crawl" id="crawl" aria-live="off"><div class="crawl-in" id="crawlIn"></div></div>
   <div class="bar t"></div><div class="bar b"></div>
-  <p class="txt" id="cineTxt" aria-live="polite"></p>
   <div class="ttl" id="cineTtl"><small>Un quiz de Team Building</small><b>Le Petit <em>Chaperon</em> rouge</b><small>et la forêt sans lumière</small>
     <label class="nm"><span>Votre prénom (facultatif)</span><input type="text" id="cineName" maxlength="24" autocomplete="off"></label>
     <button class="cgo" id="cineGo" type="button">Commencer</button></div>
@@ -130,6 +159,7 @@ body.cinema #bg { transform: scale(1.1); }
 </div>
 <div class="shade" aria-hidden="true"></div>
 <div class="vig" aria-hidden="true"></div>
+<div class="beat" id="beat" aria-hidden="true"><i></i></div>
 <div class="grain" aria-hidden="true"></div>
 <div class="tl" id="tl" aria-hidden="true"><i id="tbar"></i></div>
 <a class="back" href="index.html">← Retour à l'intro</a>
@@ -141,6 +171,7 @@ body.cinema #bg { transform: scale(1.1); }
     <p class="sub" id="sub"></p>
     <label class="name" id="nameBox" hidden><span class="label">Votre prénom (facultatif)</span><input type="text" id="name" maxlength="24" autocomplete="off"></label>
     <ol class="opts" id="opts"></ol>
+    <button class="joker" id="joker" type="button" hidden>Lever la lampe<small>retire 2 mauvaises réponses · une seule fois</small></button>
     <p class="msg" id="msg" role="status" aria-live="polite"></p>
     <div class="row">
       <button class="btn go" id="main" type="button"></button>
@@ -157,7 +188,7 @@ body.cinema #bg { transform: scale(1.1); }
 window.Limbo = (function () {
   "use strict";
   var noop = function () {};
-  var stub = { stroll: noop, cruise: noop, ask: noop, resolve: noop, wolf: noop, caught: function (cb) { if (cb) setTimeout(cb, 300); }, dawn: function (d, cb) { if (cb) setTimeout(cb, 500); }, _fire: noop, _state: function () { return {}; } };
+  var stub = { tension: noop, flare: noop, stroll: noop, cruise: noop, ask: noop, resolve: noop, wolf: noop, caught: function (cb) { if (cb) setTimeout(cb, 300); }, dawn: function (d, cb) { if (cb) setTimeout(cb, 500); }, _fire: noop, _state: function () { return {}; } };
   var canvas = document.getElementById("bg"), ctx = canvas && canvas.getContext && canvas.getContext("2d");
   if (!ctx) return stub;
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -232,6 +263,9 @@ window.Limbo = (function () {
   var ch = { y: 0, vy: 0, rot: 0, jt: 0 };
   var rocks = [], puffs = [], tree = null, owl = null;
   var T_AIR = 0.85;
+  var tens = 0, tensT = 0, flareT = 0;
+  function tension(f) { tensT = clamp((0.5 - f) / 0.5, 0, 1); }
+  function flare() { flareT = 1; }
   var wolfLv = 0, wolfX = null, wolfA = 0, wolfS = 1, wolf0 = 0, cT = -1, hideCh = false, redFlash = 0, caughtCb = null, wolfY = 0;
   function wolf(n) { wolfLv = clamp(n | 0, 0, 3); }
   /* le loup rattrape la fillette : bond, noir, flash rouge */
@@ -288,8 +322,10 @@ window.Limbo = (function () {
     time += dt;
     if (wolfX === null) wolfX = -0.3 * W;
     if (cT < 0) {
-      var wtx = wolfLv <= 0 ? -0.3 * W : wolfLv === 1 ? 0.07 * W : 0.34 * W, wta = wolfLv === 1 ? 0.7 : (wolfLv >= 2 ? 1 : 0);
-      wolfX += (wtx - wolfX) * Math.min(1, dt * 1.4); wolfA += (wta - wolfA) * Math.min(1, dt * 1.8); wolfS += ((wolfLv === 1 ? 0.85 : 1) - wolfS) * Math.min(1, dt * 2); wolfY = 0;
+      /* le loup avance avec les erreurs, et aussi quand le temps s'épuise ; la lampe levée le fait reculer */
+      var lvE = wolfLv + (mode === "ask" && wolfLv < 3 ? tens * 0.9 : 0), li = Math.min(3, Math.floor(lvE)), lf = lvE - li, PX = [-0.3, 0.07, 0.34, 0.5], PA = [0, 0.7, 1, 1];
+      var wtx = (PX[li] + (PX[Math.min(3, li + 1)] - PX[li]) * lf) * W - flareT * 0.14 * W, wta = PA[li] + (PA[Math.min(3, li + 1)] - PA[li]) * lf;
+      wolfX += (wtx - wolfX) * Math.min(1, dt * 1.4); wolfA += (wta - wolfA) * Math.min(1, dt * 1.8); wolfS += ((lvE < 1 ? 0.85 + 0.15 * lvE : 1) - wolfS) * Math.min(1, dt * 2); wolfY = 0;
     } else {
       cT += dt; var wp = clamp(cT / 0.95, 0, 1);
       wolfX = wolf0 + (cx - 0.28 * charH * 1.1 - wolf0) * wp * wp; wolfY = -Math.sin(wp * Math.PI) * 0.55 * charH; wolfA = 1; wolfS = 1;
@@ -297,6 +333,8 @@ window.Limbo = (function () {
       if (cT > 3.2 && caughtCb) { var cbb = caughtCb; caughtCb = null; cbb(); }
     }
     redFlash *= Math.max(0, 1 - dt * 2.2);
+    if (mode !== "ask") tensT = 0;
+    tens += (tensT - tens) * Math.min(1, dt * 5); flareT *= Math.max(0, 1 - dt * 0.7);
     if (dawnT >= 0) {
       dawnT += dt;
       if (dawnT > dawnDur * 0.1) ghosts.forEach(function (gh) { if (gh.a > 0 && gh.st !== "out") { gh.st = "out"; gh.fast = true; } else if (gh.st === "hid") gh.t = 99; });
@@ -428,6 +466,10 @@ window.Limbo = (function () {
     var lant = [hl[0] + Math.sin(0.25 * Math.sin(phase * 1.3) - (air ? 0.6 : 0)) * 0.02 * h, hl[1] + 0.13 * h];
     lamp = [lant[0], lant[1]];
     var fl = 0.88 + 0.12 * Math.sin(time * 19) + 0.05 * Math.sin(time * 47);
+    /* le temps s'écoule : la lumière faiblit et sursaute, jusqu'à presque s'éteindre */
+    fl *= 1 - 0.72 * tens * tens;
+    if (tens > 0.25 && Math.sin(time * (13 + 26 * tens) + Math.sin(time * 5) * 3) > 0.9 - 0.45 * tens) fl *= 0.22;
+    fl += flareT * 1.15;
     /* la lampe brille : halo, flaque de lumière au sol */
     g.save(); g.globalCompositeOperation = "lighter";
     var gr = g.createRadialGradient(lant[0], lant[1], 0, lant[0], lant[1], 2.1 * h);
@@ -753,6 +795,7 @@ window.Limbo = (function () {
     g.restore();
     if (dim > 0.01) { g.fillStyle = "rgba(0,0,0," + dim + ")"; g.fillRect(0, 0, W, H); }
     if (fade > 0.01) { g.fillStyle = "rgba(0,0,0," + fade + ")"; g.fillRect(0, 0, W, H); }
+    if (tens > 0.02) { g.fillStyle = "rgba(0,0,0," + (tens * 0.34) + ")"; g.fillRect(0, 0, W, H); }
     if (redFlash > 0.02) { g.fillStyle = "rgba(150,0,0," + (redFlash * 0.55) + ")"; g.fillRect(0, 0, W, H); }
   }
 
@@ -765,7 +808,7 @@ window.Limbo = (function () {
   document.addEventListener("visibilitychange", function () { running = !document.hidden; if (running) { last = performance.now(); requestAnimationFrame(loop); } });
   var rt; addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(resize, 120); });
   resize(); requestAnimationFrame(loop); setTimeout(buildOwl, 600);
-  return { stroll: stroll, cruise: cruise, ask: ask, resolve: resolve, dawn: dawn, wolf: wolf, caught: caught, _fire: fire,
+  return { tension: tension, flare: flare, stroll: stroll, cruise: cruise, ask: ask, resolve: resolve, dawn: dawn, wolf: wolf, caught: caught, _fire: fire,
     _ghost: function () { ghosts.forEach(function (g) { if (g.li === 4) { g.st = "stare"; g.a = 1; g.t = 30; g.gx = (scroll * 0.48 + W * (0.3 + 0.1 * ghosts.indexOf(g))) % tiles[4].t.w; } }); },
     _state: function () { return { mode: mode, y: ch.y, speed: speed, d: cur ? cur.wx - scroll - cx : null, owl: !!owl, rocks: rocks.length, tree: tree && tree.st }; } };
 })();
@@ -799,10 +842,10 @@ var QUESTIONS = [
   var $ = function (id) { return document.getElementById(id); };
   var LETTERS = ["A", "B", "C", "D", "E", "F"];
   var Limbo = window.Limbo || { stroll: function () {}, cruise: function () {}, ask: function () {}, resolve: function () {}, dawn: function (d, cb) { setTimeout(cb, 500); }, wolf: function () {}, caught: function (cb) { setTimeout(cb, 300); } };
-  var st = { i: 0, phase: "welcome", score: 0, pick: -1, timer: null, t0: 0, name: "", err: 0, over: false };
+  var st = { i: 0, phase: "welcome", score: 0, pick: -1, timer: null, t0: 0, name: "", err: 0, over: false, joker: true, off: [] };
 
-  function clearT() { clearInterval(st.timer); st.timer = null; $("tl").classList.remove("on", "low"); $("secs").textContent = ""; }
-  function reset() { clearT(); st.i = 0; st.phase = "welcome"; st.score = 0; st.pick = -1; st.err = 0; st.over = false; Limbo.wolf(0); }
+  function clearT() { clearInterval(st.timer); st.timer = null; $("tl").classList.remove("on", "low", "warm", "hot"); $("secs").className = ""; $("secs").textContent = ""; $("beat").style.setProperty("--bi", 0); }
+  function reset() { clearT(); st.i = 0; st.phase = "welcome"; st.score = 0; st.pick = -1; st.err = 0; st.over = false; st.joker = true; st.off = []; Limbo.wolf(0); }
 
   function render() {
     var total = QUESTIONS.length, q = QUESTIONS[st.i], ph = st.phase, opts = $("opts"), main = $("main");
@@ -813,7 +856,7 @@ var QUESTIONS = [
     if (ph === "welcome") {
       $("count").textContent = "Quiz individuel";
       qEl.textContent = "Prêt à entrer ?";
-      $("sub").textContent = total + " questions sur l'histoire de l'équipe. " + QZ_SECONDS + " secondes chacune. 1 point par bonne réponse. À la " + MAX_ERRORS + "e erreur d'affilée, le loup vous rattrape. Vous jouez seul.";
+      $("sub").textContent = total + " questions sur l'histoire de l'équipe. " + QZ_SECONDS + " secondes chacune. 1 point par bonne réponse. Un joker : lever la lampe retire deux mauvaises réponses. À la " + MAX_ERRORS + "e erreur d'affilée, le loup vous rattrape. Vous jouez seul.";
       main.textContent = "Commencer";
       Limbo.stroll();
       return;
@@ -855,12 +898,14 @@ var QUESTIONS = [
     qEl.textContent = q.q;
     q.a.forEach(function (txt, k) {
       var li = document.createElement("li"), b = document.createElement("button"); b.type = "button";
-      if (ph === "feedback") { b.disabled = true; b.className = k === q.c ? "right" : (k === st.pick ? "wrong" : "dim"); }
+      if (ph === "ask" && st.off.indexOf(k) >= 0) { b.disabled = true; b.className = "off"; b.setAttribute("aria-label", LETTERS[k] + " : écartée par la lampe"); }
+      else if (ph === "feedback") { b.disabled = true; b.className = k === q.c ? "right" : (k === st.pick ? "wrong" : "dim"); }
       else b.addEventListener("click", function () { pick(k); });
       var l = document.createElement("span"); l.className = "l"; l.textContent = LETTERS[k];
       var t = document.createElement("span"); t.textContent = txt;
       b.appendChild(l); b.appendChild(t); li.appendChild(b); opts.appendChild(li);
     });
+    $("joker").hidden = !(ph === "ask" && st.joker);
     if (ph === "ask") main.hidden = true;
     else {
       $("msg").textContent = st.over ? "Le loup a rattrapé la fillette. C'était la réponse " + LETTERS[q.c] + "."
@@ -871,19 +916,33 @@ var QUESTIONS = [
     }
   }
   function ask() {
-    preload(); st.phase = "ask"; st.pick = -1; st.t0 = Date.now(); clearT();
+    preload(); st.phase = "ask"; st.pick = -1; st.t0 = Date.now(); st.off = []; clearT();
     $("tl").classList.add("on"); st.timer = setInterval(tick, 100); Limbo.ask(QZ_SECONDS); render(); tick();
   }
   function tick() {
     var left = Math.max(0, QZ_SECONDS - (Date.now() - st.t0) / 1000);
     $("tbar").style.transform = "scaleX(" + (left / QZ_SECONDS) + ")";
-    $("secs").textContent = Math.ceil(left) + " s";
-    $("tl").classList.toggle("low", left <= 5);
+    var fr = left / QZ_SECONDS, tn = Math.max(0, Math.min(1, (0.5 - fr) / 0.5));
+    $("secs").textContent = left > 5 ? Math.ceil(left) + " s" : left.toFixed(1) + " s";
+    $("secs").className = fr <= 0.25 ? "hot" : fr <= 0.5 ? "warm" : "";
+    $("tl").classList.toggle("warm", fr <= 0.5 && fr > 0.25); $("tl").classList.toggle("hot", fr <= 0.25);
+    var bt = 60 / (60 + 100 * tn); $("secs").style.setProperty("--bt", bt + "s"); $("beat").style.setProperty("--bt", bt + "s"); $("beat").style.setProperty("--bi", tn * 0.95);
+    $("tl").classList.toggle("low", left <= 5); Limbo.tension(left / QZ_SECONDS); $("joker").classList.toggle("hot", st.joker && left / QZ_SECONDS <= 0.5);
     if (left <= 0 && st.phase === "ask") pick(-1);
   }
+  function useJoker() {
+    if (st.phase !== "ask" || !st.joker) return;
+    st.joker = false; $("joker").classList.remove("hot"); var q = QUESTIONS[st.i], bad = [];
+    q.a.forEach(function (_, k) { if (k !== q.c && st.off.indexOf(k) < 0) bad.push(k); });
+    for (var n = 0; n < 2 && bad.length > 1; n++) st.off.push(bad.splice((Math.random() * bad.length) | 0, 1)[0]);
+    Limbo.flare(); render(); $("joker").hidden = true;
+    var f = document.querySelector(".opts button:not(:disabled)"); if (f) f.focus();
+  }
+  $("joker").addEventListener("click", useJoker);
   function pick(k) {
     if (st.phase !== "ask") return;
-    clearT(); st.pick = k; st.phase = "feedback";
+    if (k >= 0 && st.off.indexOf(k) >= 0) return;
+    clearT(); Limbo.tension(1); st.pick = k; st.phase = "feedback";
     var good = k === QUESTIONS[st.i].c; if (good) st.score++;
     if (good) { st.err = 0; Limbo.wolf(0); Limbo.resolve(true); }
     else {
@@ -919,20 +978,21 @@ var QUESTIONS = [
   $("again").addEventListener("click", function () { reset(); render(); });
   document.addEventListener("keydown", function (e) {
     if (st.phase !== "ask" || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key.toLowerCase() === "j") { useJoker(); return; }
     var k = "abcd1234".indexOf(e.key.toLowerCase());
     if (k >= 0) pick(k % 4);
   });
   /* ---------- Annonce cinématique ---------- */
   var STORY = [
-    "Il était une fois une petite fille que tout le monde appelait le Petit Chaperon rouge.",
-    "Ce soir-là, sa grand-mère l'attendait de l'autre côté de la forêt.",
-    "Mais la nuit est tombée plus vite que prévu. Les arbres se sont refermés derrière elle.",
-    "Elle n'avait que sa petite lampe. Et derrière elle, le loup avance à chaque faux pas. Trois erreurs d'affilée, et il la rattrape.",
-    "Des yeux la guettent derrière les troncs. Des ailes sifflent au-dessus de sa tête.",
-    "Pour avancer, elle devra franchir des gouffres. Une bonne réponse, et elle saute. Une mauvaise, et elle tombe.",
-    "Si elle atteint l'autre rive, sa lampe rendra sa lumière à la forêt. Et vous saurez enfin le thème."
+    { k: "Il était une fois" },
+    "Une petite fille que tout le monde appelait le Petit Chaperon rouge.",
+    "Quelque part, au bout de la forêt, un secret l'attendait : le thème de la prochaine aventure de l'équipe. Personne ne l'offre. Il se mérite.",
+    "La nuit est tombée plus vite que prévu. Elle n'avait qu'une petite lampe, minuscule, mais qui ne s'est jamais éteinte.",
+    "Dans l'ombre, des yeux la guettent. Et derrière elle, le loup avance à chaque faux pas. Trois erreurs d'affilée, et il la rattrape.",
+    "Ce qui fait briller la lampe, c'est tout ce que vous avez vécu ensemble. Chaque bonne réponse rend un peu de lumière à la forêt.",
+    { t: "Alors avancez. Au bout du chemin, le thème vous attend.", last: true }
   ];
-  var cineT = [], cineOn = false;
+  var cineT = [], cineOn = false, crawlAnim = null;
   function cineAt(ms, fn) { cineT.push(setTimeout(fn, ms)); }
   function cineEnd() {
     if (!cineOn) return; cineOn = false; cineT.forEach(clearTimeout); cineT = [];
@@ -942,9 +1002,14 @@ var QUESTIONS = [
   /* Écran titre : le titre, le prénom et « Commencer » sont sur la même page */
   var titleOn = false;
   function showTitle() {
-    if (!cineOn || titleOn) return; titleOn = true; cineT.forEach(clearTimeout); cineT = [];
-    $("cineTxt").classList.add("out"); $("cineSkip").style.display = "none"; $("cineTtl").classList.add("on");
-    setTimeout(function () { try { $("cineName").focus({ preventScroll: true }); } catch (e) {} }, 1700);
+    if (!cineOn || titleOn) return;
+    if (crawlAnim && crawlAnim.playState !== "finished") { try { crawlAnim.finish(); } catch (e) { arrived(); } } else arrived();
+  }
+  function arrived() {
+    if (titleOn) return; titleOn = true; cineT.forEach(clearTimeout); cineT = [];
+    $("crawl").classList.add("fixed"); $("cineSkip").style.display = "none";
+    var inn = $("crawlIn"); inn.style.transform = "translate3d(0," + inn.dataset.yend + "px,0)";
+    setTimeout(function () { try { $("cineName").focus({ preventScroll: true }); } catch (e) {} }, 400);
   }
   function startFromTitle() {
     if (!titleOn) return;
@@ -954,20 +1019,28 @@ var QUESTIONS = [
   function cine() {
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     cineOn = true; document.body.classList.add("cinema");
-    var box = $("cineTxt"), t = 5000;
-    STORY.forEach(function (line, i) {
-      var words = line.split(" "), dur = 2800 + words.length * 420;
-      cineAt(t, function () {
-        box.classList.remove("out"); box.textContent = "";
-        words.forEach(function (w, k) { var sp = document.createElement("span"); sp.textContent = w + " "; box.appendChild(sp); setTimeout(function () { sp.classList.add("in"); }, 80 + k * 340); });
-        if (i === 3) try { Limbo._ghost(); Limbo.wolf(1); } catch (e) {}
-        if (i === 4) try { Limbo._fire("owl"); } catch (e) {}
-        if (i === 5) try { Limbo._fire("rocks"); } catch (e) {}
-      });
-      cineAt(t + dur, function () { box.classList.add("out"); });
-      t += dur + 1500;
+    var inn = $("crawlIn");
+    STORY.forEach(function (it) {
+      var p = document.createElement("p");
+      if (typeof it === "string") p.textContent = it; else if (it.k) { p.className = "k"; p.textContent = it.k; } else { p.textContent = it.t; if (it.last) p.className = "last"; }
+      inn.appendChild(p);
     });
-    cineAt(t, showTitle);
+    var ttl = $("cineTtl"); ttl.classList.add("on"); inn.appendChild(ttl);
+    /* le texte monte depuis le bas de l'écran ; le titre le suit puis se fige au centre avec le champ prénom */
+    var vh = innerHeight, y0 = vh * 1.1, yend = vh * 0.5 - (ttl.offsetTop + ttl.offsetHeight / 2), dur = 56000;
+    inn.dataset.yend = yend;
+    cineAt(3800, function () {
+      if (!inn.animate) { arrived(); return; }
+      crawlAnim = inn.animate([
+        { transform: "translate3d(0," + y0 + "px,0) rotateX(9deg)" },
+        { transform: "translate3d(0," + yend + "px,0) rotateX(0deg)" }
+      ], { duration: dur, easing: "cubic-bezier(.25,.25,.3,1)", fill: "forwards" });
+      crawlAnim.onfinish = arrived;
+      cineAt(dur * 0.38, function () { try { Limbo._ghost(); Limbo.wolf(1); } catch (e) {} });
+      cineAt(dur * 0.52, function () { try { Limbo._fire("owl"); } catch (e) {} });
+      cineAt(dur * 0.64, function () { try { Limbo._fire("rocks"); } catch (e) {} });
+      cineAt(dur * 0.8, function () { try { Limbo.wolf(0); } catch (e) {} });
+    });
   }
   $("cineSkip").addEventListener("click", showTitle);
   $("cineGo").addEventListener("click", startFromTitle);
