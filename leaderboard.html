@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classement des joueurs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Jost:wght@300;400;500&display=swap">
+<style>
+:root { --f-title: "IM Fell DW Pica", Georgia, serif; --f-ui: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif; --paper: #f2f2f2; --dim: #9a9a9a; --line: rgba(255, 255, 255, 0.16); color-scheme: dark; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; min-height: 100%; background: #070809; color: var(--paper); font-family: var(--f-ui); }
+body { min-height: 100vh; position: relative; overflow-x: hidden; }
+/* Décor : forêt de la nuit, lueur de la lampe */
+.bg { position: fixed; inset: 0; z-index: 0; background:
+  radial-gradient(60% 45% at 50% 0%, rgba(255, 214, 90, 0.22), transparent 70%),
+  repeating-linear-gradient(90deg, transparent 0 46px, rgba(255, 255, 255, 0.025) 46px 49px, transparent 49px 120px, rgba(255, 255, 255, 0.04) 120px 122px),
+  linear-gradient(180deg, #17191c 0%, #0b0c0e 60%, #050505 100%); }
+.bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, transparent 35%, rgba(0, 0, 0, 0.75) 100%); }
+.back { position: fixed; z-index: 5; top: 14px; left: 18px; min-height: 44px; display: inline-flex; align-items: center; color: var(--dim); text-decoration: none; font: 400 0.72rem/1 var(--f-ui); letter-spacing: 0.26em; text-transform: uppercase; }
+.back:hover, .back:focus-visible { color: #fff; outline: none; text-decoration: underline; text-underline-offset: 6px; }
+main { position: relative; z-index: 2; width: min(860px, 100%); margin: 0 auto; padding: 72px 20px 60px; }
+.k { margin: 0 0 10px; font: 400 0.78rem/1.3 var(--f-ui); letter-spacing: 0.34em; text-transform: uppercase; color: var(--dim); }
+h1 { margin: 0 0 6px; font: italic 400 clamp(2.4rem, 8vw, 4.6rem)/1.05 var(--f-title); text-shadow: 0 0 40px rgba(255, 214, 90, 0.25); }
+h1 em { color: #d3231d; }
+.sub { margin: 0 0 28px; color: #c9c9c9; font-weight: 300; font-size: 1.02rem; line-height: 1.5; }
+.live { display: inline-flex; align-items: center; gap: 8px; font: 400 0.7rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); margin-bottom: 18px; }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: #ffd25a; box-shadow: 0 0 12px #ffd25a; animation: bl 2.4s ease-in-out infinite; }
+@keyframes bl { 50% { opacity: 0.3; } }
+.podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 6px 0 26px; align-items: end; }
+.pod { border: 1px solid var(--line); background: rgba(255, 255, 255, 0.04); padding: 16px 14px 14px; text-align: center; min-width: 0; position: relative; }
+.pod .r { font: italic 400 2.6rem/1 var(--f-title); }
+.pod .n { margin: 8px 0 4px; font: italic 400 1.35rem/1.2 var(--f-title); overflow-wrap: anywhere; }
+.pod .s { font: 400 0.8rem/1.3 var(--f-ui); letter-spacing: 0.12em; color: #d7d7d7; }
+.pod.p1 { order: 2; padding-top: 28px; padding-bottom: 22px; border-color: rgba(255, 214, 90, 0.7); background: rgba(255, 214, 90, 0.08); box-shadow: 0 0 46px rgba(255, 200, 60, 0.22); }
+.pod.p1 .r { color: #ffd25a; font-size: 3.4rem; }
+.pod.p2 { order: 1; } .pod.p3 { order: 3; }
+.pod.p2 .r { color: #d9d9d9; } .pod.p3 .r { color: #c98c5a; }
+.pod:empty { visibility: hidden; }
+table { width: 100%; border-collapse: collapse; }
+caption { text-align: left; font: 400 0.72rem/1 var(--f-ui); letter-spacing: 0.26em; text-transform: uppercase; color: var(--dim); padding-bottom: 10px; }
+th { text-align: left; font: 400 0.68rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); padding: 10px 8px; border-bottom: 1px solid var(--line); }
+td { padding: 14px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-size: 1.02rem; vertical-align: middle; }
+td.rk { width: 56px; font: italic 400 1.5rem/1 var(--f-title); color: #cfcfcf; }
+td.nm { font: italic 400 1.35rem/1.2 var(--f-title); overflow-wrap: anywhere; }
+td.sc, td.tm { white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.ou { color: #bdbdbd; font-size: 0.86rem; }
+tr.me td { background: rgba(255, 214, 90, 0.1); }
+tr.me td.nm::after { content: "  · vous"; font: 400 0.7rem/1 var(--f-ui); letter-spacing: 0.2em; text-transform: uppercase; color: #ffd25a; }
+.ou .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; background: #ffd25a; box-shadow: 0 0 8px #ffd25a; }
+.ou .dot.w { background: #d3231d; box-shadow: 0 0 8px #d3231d; }
+.empty { padding: 42px 0; text-align: center; font: italic 400 1.35rem/1.5 var(--f-title); color: #cfcfcf; }
+.note { margin-top: 22px; color: var(--dim); font-size: 0.86rem; line-height: 1.6; }
+.btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; margin-top: 22px; border: 1px solid #fff; border-radius: 2px; background: #ececec; color: #0a0a0a; text-decoration: none; font: 400 0.82rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; }
+.btn:hover, .btn:focus-visible { background: #fff; outline: none; }
+@media (max-width: 620px) { .pod .n { font-size: 1.05rem; } th.ou, td.ou { display: none; } main { padding-top: 64px; } }
+@media (prefers-reduced-motion: reduce) { .live i { animation: none; } }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<a class="back" href="theme.html" id="back">&larr; Retour</a>
+<main>
+  <p class="k">Le Petit Chaperon rouge</p>
+  <h1>Le <em>classement</em></h1>
+  <p class="sub">Les joueurs sont classés par nombre de bonnes réponses, puis par temps total de réponse. Chacun garde son meilleur résultat.</p>
+  <div class="live" id="live"><i></i><span id="liveTxt">Chargement du classement</span></div>
+  <div class="podium" id="podium" aria-label="Podium"></div>
+  <table id="tbl" hidden>
+    <caption>Tous les joueurs</caption>
+    <thead><tr><th>Rang</th><th>Joueur</th><th>Score</th><th>Temps</th><th class="ou">Issue</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="empty" id="empty" hidden>Personne n'a encore traversé la forêt.<br>Soyez le premier.</p>
+  <p class="note" id="note" hidden></p>
+  <a class="btn" href="quiz.html" id="again">Jouer au quiz</a>
+</main>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var TOTAL_DEFAULT = 10, myId = null, loaded = false;
+  var mm = function (ms) { var s = Math.round(ms / 1000), m = Math.floor(s / 60); return m + ":" + ("0" + (s % 60)).slice(-2); };
+  var rk = function (i) { return i === 0 ? "1er" : (i + 1) + "e"; };
+
+  function render(list) {
+    loaded = true;
+    list.sort(function (a, b) { return (b.score - a.score) || (a.ms - b.ms) || (a.at - b.at); });
+    $("liveTxt").textContent = list.length + (list.length > 1 ? " joueurs" : " joueur") + "  ·  mise à jour en direct";
+    $("empty").hidden = list.length > 0; $("tbl").hidden = list.length === 0; $("note").hidden = true;
+    var pod = $("podium"); pod.textContent = "";
+    list.slice(0, 3).forEach(function (p, i) {
+      var d = document.createElement("div"); d.className = "pod p" + (i + 1);
+      var r = document.createElement("div"); r.className = "r"; r.textContent = rk(i);
+      var n = document.createElement("div"); n.className = "n"; n.textContent = p.name || "Anonyme";
+      var s = document.createElement("div"); s.className = "s"; s.textContent = p.score + " / " + (p.total || TOTAL_DEFAULT) + "  ·  " + mm(p.ms);
+      d.appendChild(r); d.appendChild(n); d.appendChild(s); pod.appendChild(d);
+    });
+    var body = $("rows"); body.textContent = "";
+    list.forEach(function (p, i) {
+      var tr = document.createElement("tr"); if (p.id && p.id === myId) tr.className = "me";
+      function td(c, t) { var e = document.createElement("td"); e.className = c; e.textContent = t; tr.appendChild(e); return e; }
+      td("rk", rk(i)); td("nm", p.name || "Anonyme"); td("sc", p.score + " / " + (p.total || TOTAL_DEFAULT)); td("tm", mm(p.ms));
+      var o = td("ou", ""); var dot = document.createElement("span"); dot.className = "dot" + (p.outcome === "loup" ? " w" : ""); o.appendChild(dot);
+      o.appendChild(document.createTextNode(p.outcome === "loup" ? "Rattrapé par le loup" : "Lumière rendue"));
+      body.appendChild(tr);
+    });
+  }
+
+  function offline() {
+    if (loaded) return;
+    $("liveTxt").textContent = "Classement partagé indisponible";
+    var mine = null; try { mine = JSON.parse(localStorage.getItem("cpr_best") || "null"); } catch (e) {}
+    $("note").hidden = false;
+    $("note").textContent = "Le classement commun s'affiche seulement dans la page partagée, une fois connecté. Ouvrez le lien du quiz envoyé par l'organisateur.";
+    if (mine) render([{ id: "me", name: mine.name, score: mine.score, total: mine.total, ms: mine.ms, outcome: mine.outcome, at: mine.at }]), myId = "me", $("note").hidden = false;
+  }
+
+  /* classement partagé : une ligne par joueur, mise à jour en direct */
+  var timer = setTimeout(offline, 10000);
+  if (!(window.claude && claude.use)) { clearTimeout(timer); offline(); return; }
+  Promise.all([claude.use("db"), claude.use("user")]).then(function (r) {
+    var db = r[0], user = r[1];
+    if (!db) { clearTimeout(timer); offline(); return; }
+    var go = function () {
+      db.collection("scores").onSnapshot(function (snap) {
+        clearTimeout(timer);
+        var arr = snap && snap.docs ? snap.docs : (Array.isArray(snap) ? snap : []), out = [];
+        arr.forEach(function (d) { var v = typeof d.data === "function" ? d.data() : d; if (v && typeof v.score === "number") { v.id = d.id || v.id; out.push(v); } });
+        render(out);
+      }, function () { clearTimeout(timer); offline(); });
+    };
+    if (user && user.id) user.id().then(function (id) { myId = id; go(); }, go); else go();
+  }, function () { clearTimeout(timer); offline(); });
+})();
+</script>
+</body>
+</html>
