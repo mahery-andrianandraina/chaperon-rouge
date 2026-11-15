@@ -32,6 +32,65 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--paper
 .tl.hot i { background: #ff3b2e; box-shadow: 0 0 26px rgba(255, 50, 40, 1); }
 /* Chrono bien visible : grand nombre qui change de couleur et palpite */
 #secs { font: italic 400 clamp(2.4rem, 5.8vw, 4.2rem)/1 var(--f-title); letter-spacing: 0.02em; min-width: 3.2ch; text-align: right; color: #f2f2f2; text-shadow: 0 0 22px rgba(255, 255, 255, 0.35); text-transform: none; align-self: flex-end; transform-origin: 100% 100%; font-variant-numeric: lining-nums tabular-nums; transition: color 0.4s, text-shadow 0.4s; }
+/* notification : un fantôme traverse lentement l'écran en portant un panneau, avec brume, étincelles et éclair froid (discret, ne bloque rien) */
+.ghx { position: fixed; z-index: 27; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(70% 55% at 50% 22%, rgba(190, 225, 255, 0.55), rgba(120, 160, 210, 0.12) 55%, transparent 78%); }
+.ghx.go { animation: ghflash 2.4s ease-out forwards; }
+@keyframes ghflash { 0% { opacity: 0; } 8% { opacity: 0.9; } 16% { opacity: 0.12; } 24% { opacity: 0.6; } 100% { opacity: 0; } }
+.gh { position: fixed; z-index: 28; top: 6px; left: 0; display: flex; align-items: flex-start; pointer-events: none; opacity: 0; transform: translateX(108vw); will-change: transform, opacity; }
+.gh.go { animation: ghfly 20s linear forwards; }
+@keyframes ghfly { 0% { transform: translateX(108vw); opacity: 0; } 5% { opacity: 1; } 88% { opacity: 1; filter: none; } 100% { transform: translateX(-480px); opacity: 0; filter: blur(5px); } }
+.gh .drift { display: flex; align-items: flex-start; animation: ghwave 5.5s ease-in-out infinite; }
+@keyframes ghwave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(22px); } }
+.gh .mist { position: absolute; left: 40px; top: 6px; width: 520px; height: 96px; pointer-events: none; background: radial-gradient(60% 60% at 8% 50%, rgba(214, 226, 238, 0.5), transparent 70%), radial-gradient(40% 50% at 40% 55%, rgba(200, 214, 230, 0.28), transparent 75%), radial-gradient(34% 40% at 72% 45%, rgba(190, 206, 224, 0.16), transparent 75%); filter: blur(10px); }
+.gh .wind { position: absolute; left: 70px; height: 2px; width: 160px; border-radius: 2px; background: linear-gradient(90deg, rgba(220, 235, 250, 0.7), transparent); opacity: 0; animation: ghwind 1.8s ease-out infinite; animation-delay: var(--d); top: var(--t); z-index: 0; }
+@keyframes ghwind { 0% { opacity: 0; transform: translateX(-30px) scaleX(0.4); } 25% { opacity: 0.8; } 100% { opacity: 0; transform: translateX(260px) scaleX(1.3); } }
+.gh .leaf { position: absolute; left: 80px; top: var(--t); width: 9px; height: 5px; border-radius: 80% 0 80% 0; background: #8a3a1e; opacity: 0; z-index: 0; animation: ghleaf 3.4s ease-in infinite; animation-delay: var(--d); }
+@keyframes ghleaf { 0% { opacity: 0; transform: translate(0, 0) rotate(0); } 15% { opacity: 0.9; } 100% { opacity: 0; transform: translate(330px, var(--y)) rotate(540deg); } }
+.gh .body { position: relative; width: 86px; height: 104px; flex: none; z-index: 2; animation: ghflick 3.2s steps(1) infinite, ghshiver 0.18s linear infinite; filter: drop-shadow(0 0 20px rgba(220, 235, 250, 0.75)); }
+.gh .body svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.gh .eye { animation: gheye 2.8s ease-in-out infinite; }
+@keyframes gheye { 50% { opacity: 0.55; } }
+@keyframes ghflick { 0% { opacity: 0.95; } 31% { opacity: 0.5; } 34% { opacity: 0.95; } 70% { opacity: 0.8; } 73% { opacity: 0.38; } 76% { opacity: 0.95; } }
+@keyframes ghshiver { 0% { margin-left: 0; } 50% { margin-left: 1px; } 100% { margin-left: 0; } }
+.gh .spark { position: absolute; left: 70px; top: 40px; width: 4px; height: 4px; border-radius: 50%; background: #e8f4ff; box-shadow: 0 0 8px 2px rgba(210, 235, 255, 0.85); opacity: 0; z-index: 1; animation: ghspark 2.6s ease-out infinite; animation-delay: var(--d); }
+@keyframes ghspark { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)); } }
+.gh .pole { position: relative; z-index: 3; flex: none; width: 5px; height: 100px; margin: -2px 0 0 -3px; border-radius: 3px; background: linear-gradient(90deg, #8e969d, #eef2f5 45%, #7b838a); box-shadow: 0 0 10px rgba(220, 235, 250, 0.5); }
+.gh .pole::before { content: ""; position: absolute; left: -2px; top: -5px; width: 9px; height: 9px; border-radius: 50%; background: #ffd25a; box-shadow: 0 0 10px rgba(255, 210, 90, 0.8); }
+.gh .sign { position: relative; z-index: 2; margin: 10px 0 0 -2px; padding: 12px 52px 14px 18px; min-width: 210px; max-width: 320px; transform-origin: 0 20%; animation: ghflag 2.6s ease-in-out infinite; }
+.gh .sign::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #ffd25a 0 5px, transparent 5px), linear-gradient(115deg, rgba(40, 8, 8, 0.96), rgba(12, 6, 6, 0.93) 45%, rgba(70, 14, 12, 0.94)); clip-path: polygon(0 0, 100% 0, calc(100% - 26px) 50%, 100% 100%, 0 100%); filter: url(#wind); }
+.gh .sign::after { content: ""; position: absolute; inset: 0; z-index: -2; background: rgba(0, 0, 0, 0.35); filter: blur(12px); }
+@keyframes ghflag { 0%, 100% { transform: perspective(700px) rotateY(0deg) skewY(-1.5deg); } 25% { transform: perspective(700px) rotateY(-9deg) skewY(1.5deg); } 50% { transform: perspective(700px) rotateY(-16deg) skewY(2.8deg) scaleX(0.96); } 75% { transform: perspective(700px) rotateY(-6deg) skewY(0deg); } }
+.gh.rec .sign::before { background: linear-gradient(90deg, #fff1b0 0 5px, transparent 5px), linear-gradient(115deg, rgba(96, 62, 6, 0.97), rgba(40, 26, 4, 0.94) 45%, rgba(120, 82, 8, 0.95)); }
+.gh.rec .sign em { color: #ffe08a; text-shadow: 0 0 16px rgba(255, 210, 90, 0.7); }
+.gh.rec .sign span { color: #ffe9a8; }
+.gh .bub { position: relative; z-index: 2; margin: 14px 0 0 12px; padding: 12px 20px 13px 18px; min-width: 190px; max-width: 300px; border-radius: 4px 18px 18px 18px; background: linear-gradient(180deg, rgba(26, 22, 14, 0.94), rgba(8, 7, 7, 0.94)); color: #f2f2f2; border: 1px solid rgba(255, 210, 90, 0.55); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65), 0 0 26px rgba(255, 210, 90, 0.22), inset 0 0 22px rgba(255, 210, 90, 0.06); transform-origin: 0 60%; animation: bubpop 0.7s cubic-bezier(.2, 1.4, .4, 1) both, bubbob 3.6s ease-in-out 0.7s infinite; }
+.gh .bub::before { content: ""; position: absolute; left: -11px; top: 28px; width: 18px; height: 18px; background: rgba(20, 17, 11, 0.97); border-left: 1px solid rgba(255, 210, 90, 0.55); border-bottom: 1px solid rgba(255, 210, 90, 0.55); transform: rotate(45deg); }
+@keyframes bubpop { 0% { transform: scale(0.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes bubbob { 0%, 100% { transform: translateY(0) rotate(-0.6deg); } 50% { transform: translateY(-4px) rotate(0.6deg); } }
+.gh .bub b { display: block; font: italic 400 1.65rem/1.1 var(--f-title); color: #ffd25a; text-shadow: 0 0 16px rgba(255, 210, 90, 0.45); overflow-wrap: anywhere; }
+.gh .bub b i { display: inline-block; font-style: italic; opacity: 0; transform: translateY(4px); animation: ghl 0.25s ease forwards; animation-delay: calc(var(--k) * 70ms + 0.8s); }
+.gh .bub span { display: block; margin-top: 3px; font: 500 0.78rem/1.4 var(--f-ui); letter-spacing: 0.14em; text-transform: uppercase; color: #dedede; opacity: 0; animation: ghl 0.4s ease 1.9s forwards; }
+.gh .bub em { display: block; margin-top: 4px; font: italic 400 1.3rem/1.2 var(--f-title); color: #ff5646; text-shadow: 0 0 14px rgba(255, 60, 40, 0.5); opacity: 0; animation: ghl 0.4s ease 2.7s forwards; }
+.gh.rec .bub { border-color: #ffe08a; background: linear-gradient(180deg, rgba(70, 48, 6, 0.96), rgba(22, 15, 3, 0.95)); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65), 0 0 38px rgba(255, 210, 90, 0.55); }
+.gh.rec .bub::before { background: rgba(60, 41, 5, 0.97); border-color: #ffe08a; }
+.gh.rec .bub b { color: #fff1b0; } .gh.rec .bub em { color: #ffe08a; text-shadow: 0 0 14px rgba(255, 210, 90, 0.7); }
+.gh .mouth { transform-box: fill-box; transform-origin: center; }
+.gh.go .mouth { animation: talk 0.26s ease-in-out 0.8s 11; }
+@keyframes talk { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.25, 0.28); } }
+@media (max-width: 560px) { .gh .bub { min-width: 150px; max-width: 220px; padding: 8px 12px 9px 12px; margin-top: 8px; } .gh .bub b { font-size: 1.25rem; } .gh .bub em { font-size: 1.05rem; } .gh .bub::before { top: 20px; } }
+@media (prefers-reduced-motion: reduce) { .gh .bub, .gh.go .mouth { animation: none; } .gh .wind, .gh .leaf { display: none; } }
+#streak { position: fixed; z-index: 26; left: 50%; bottom: 7vh; transform: translate(-50%, 10px); opacity: 0; pointer-events: none; text-align: center; font: italic 400 clamp(1.3rem, 3.4vw, 2rem)/1.2 var(--f-title); color: #ffe08a; text-shadow: 0 0 22px rgba(255, 210, 90, 0.75), 0 2px 10px rgba(0, 0, 0, 0.8); white-space: nowrap; }
+#streak small { display: block; margin-top: 4px; font: 400 0.7rem/1 var(--f-ui); letter-spacing: 0.3em; text-transform: uppercase; color: #f3f3f3; text-shadow: 0 1px 6px #000; }
+#streak.go { animation: strk 3.2s ease forwards; }
+@keyframes strk { 0% { opacity: 0; transform: translate(-50%, 14px) scale(0.92); filter: blur(6px); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1); filter: none; } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -10px); } }
+.gh .sign b { display: block; font: italic 400 1.6rem/1.1 var(--f-title); color: #fff; overflow-wrap: anywhere; }
+.gh .sign b i { display: inline-block; font-style: italic; opacity: 0; filter: blur(10px); transform: translateY(6px); text-shadow: 0 0 18px rgba(255, 210, 90, 0.8); animation: ghl 1.1s ease forwards; animation-delay: calc(var(--k) * 90ms + 1.2s); }
+@keyframes ghl { to { opacity: 1; filter: none; transform: none; } }
+.gh .sign span { display: block; font: 400 0.76rem/1.4 var(--f-ui); letter-spacing: 0.14em; text-transform: uppercase; color: #dedede; }
+.gh .sign em { display: block; margin-top: 3px; font: italic 400 1.15rem/1.2 var(--f-title); color: #ff5646; text-shadow: 0 0 16px rgba(255, 60, 40, 0.55); animation: ghrush 0.9s ease-in-out infinite; }
+@keyframes ghrush { 50% { opacity: 0.45; } }
+@media (max-width: 560px) { .gh { top: 14px; } .gh .body { width: 60px; height: 72px; } .gh .pole { height: 84px; } .gh .sign { min-width: 150px; max-width: 230px; padding: 8px 40px 9px 12px; margin-top: 8px; } .gh .sign b { font-size: 1.25rem; } .gh .mist { width: 360px; } }
+@media (prefers-reduced-motion: reduce) { .gh.go { animation-duration: 22s; } .gh .drift, .gh .body, .gh .sign, .gh .sign em, .gh .spark, .gh .eye { animation: none; } .ghx.go { animation: none; } .gh .sign::before { filter: none; } .gh .wind, .gh .leaf { display: none; } }
 #secs.warm { color: #ffc94a; text-shadow: 0 0 26px rgba(255, 190, 50, 0.6); }
 #secs.hot { color: #ff4a3c; text-shadow: 0 0 30px rgba(255, 50, 40, 0.8); animation: throb var(--bt, 0.6s) ease-in-out infinite; }
 @keyframes throb { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.22); } 28% { transform: scale(1); } 42% { transform: scale(1.14); } 60% { transform: scale(1); } }
@@ -152,6 +211,15 @@ body.cinema #bg { transform: scale(1.1); }
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="wind" x="-4%" y="-15%" width="110%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.010 0.045" numOctaves="2" seed="4" result="n"><animate attributeName="baseFrequency" dur="3.2s" values="0.010 0.045;0.020 0.075;0.010 0.045" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+<div class="ghx" id="ghx" aria-hidden="true"></div>
+<div id="streak" role="status" aria-live="polite"></div>
+<div class="gh" id="gh" role="status" aria-live="polite"><div class="drift"><i class="mist"></i><i class="wind" style="--d:0s;--t:20px"></i><i class="wind" style="--d:0.4s;--t:48px"></i><i class="wind" style="--d:0.9s;--t:76px"></i><i class="wind" style="--d:1.3s;--t:34px"></i><i class="wind" style="--d:0.7s;--t:92px"></i><i class="leaf" style="--d:0.2s;--t:30px;--y:40px"></i><i class="leaf" style="--d:1.1s;--t:60px;--y:-20px"></i><i class="leaf" style="--d:2.0s;--t:45px;--y:50px"></i><i class="leaf" style="--d:2.7s;--t:80px;--y:10px"></i><i class="spark" style="--d:0s;--x:90px;--y:-30px"></i><i class="spark" style="--d:0.5s;--x:140px;--y:20px"></i><i class="spark" style="--d:1.0s;--x:60px;--y:40px"></i><i class="spark" style="--d:1.5s;--x:170px;--y:-10px"></i><i class="spark" style="--d:2.0s;--x:110px;--y:30px"></i><i class="spark" style="--d:0.9s;--x:200px;--y:-24px"></i><div class="body" aria-hidden="true"><svg viewBox="0 0 64 78"><defs><linearGradient id="ghg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f5f8"/><stop offset="0.7" stop-color="#b3bcc4" stop-opacity="0.8"/><stop offset="1" stop-color="#9aa2a8" stop-opacity="0.15"/></linearGradient><radialGradient id="gge"><stop offset="0" stop-color="#bfe3ff" stop-opacity="0.9"/><stop offset="1" stop-color="#bfe3ff" stop-opacity="0"/></radialGradient></defs>
+<path d="M32 4C15 4 8 17 8 33v25c0 4-3 8-6 12 5-1 8 1 11 5 3-3 6-3 9 0 3-4 6-4 10 0 3-3 6-3 9 0 3-3 6-4 11-5-3-4-6-8-6-12V33C46 17 49 4 32 4z" fill="url(#ghg)"/>
+<circle cx="23" cy="30" r="12" fill="url(#gge)" class="eye"/><circle cx="42" cy="30" r="12" fill="url(#gge)" class="eye"/>
+<ellipse cx="23" cy="30" rx="5.5" ry="7.5" fill="#050607"/><ellipse cx="42" cy="30" rx="5.5" ry="7.5" fill="#050607"/><ellipse class="mouth" cx="32.5" cy="46" rx="4" ry="6.5" fill="#050607"/>
+</svg></div>
+<div class="bub"><b id="ghName"></b><span id="ghSub">a trouvé le thème</span><em id="ghRush"></em></div></div></div>
 <div id="arrive" aria-hidden="true"><div class="af"></div></div>
 <div class="cine" id="cine" aria-label="Annonce du jeu">
   <div class="crawl" id="crawl" aria-live="off"><div class="crawl-in" id="crawlIn"></div></div>
@@ -924,7 +992,7 @@ var QUESTIONS = [
     }
   }
   function ask() {
-    preload(); st.phase = "ask"; st.pick = -1; st.t0 = Date.now(); st.off = []; clearT();
+    if (st.i === 0) st.streak = 0; preload(); watch(); st.phase = "ask"; st.pick = -1; st.t0 = Date.now(); st.off = []; clearT();
     $("tl").classList.add("on"); st.timer = setInterval(tick, 100); Limbo.ask(QZ_SECONDS); render(); tick();
   }
   function tick() {
@@ -937,6 +1005,13 @@ var QUESTIONS = [
     var bt = 60 / (60 + 100 * tn); $("secs").style.setProperty("--bt", bt + "s"); $("beat").style.setProperty("--bt", bt + "s"); $("beat").style.setProperty("--bi", tn * 0.95);
     $("tl").classList.toggle("low", left <= 5); Limbo.tension(left / QZ_SECONDS); $("joker").classList.toggle("hot", st.joker && left / QZ_SECONDS <= 0.5);
     if (left <= 0 && st.phase === "ask") pick(-1);
+  }
+  var STRK = [["Le loup recule…", "3 bonnes réponses d'affilée"], ["Le loup hésite…", "6 d'affilée, la forêt s'éclaire"], ["La lampe brille !", "9 d'affilée, intouchable"]], strT = null;
+  function streakMsg(n) {
+    if (n % 3 !== 0 || n > 9) return; var m = STRK[n / 3 - 1], el = $("streak");
+    el.textContent = ""; el.appendChild(document.createTextNode(m[0])); var sm = document.createElement("small"); sm.textContent = m[1]; el.appendChild(sm);
+    el.classList.remove("go"); void el.offsetWidth; el.classList.add("go"); try { Limbo.flare(); } catch (e) {}
+    clearTimeout(strT); strT = setTimeout(function () { el.classList.remove("go"); }, 3300);
   }
   function useJoker() {
     if (st.phase !== "ask" || !st.joker) return;
@@ -952,9 +1027,9 @@ var QUESTIONS = [
     if (k >= 0 && st.off.indexOf(k) >= 0) return;
     st.ms += Math.min(QZ_SECONDS * 1000, Date.now() - st.t0); clearT(); Limbo.tension(1); st.pick = k; st.phase = "feedback";
     var good = k === QUESTIONS[st.i].c; if (good) st.score++;
-    if (good) { st.err = 0; Limbo.wolf(0); Limbo.resolve(true); }
+    if (good) { st.err = 0; st.streak = (st.streak || 0) + 1; Limbo.wolf(0); Limbo.resolve(true); streakMsg(st.streak); }
     else {
-      st.err++;
+      st.err++; st.streak = 0;
       if (st.err >= MAX_ERRORS) { st.over = true; Limbo.caught(function () { if (st.over && st.phase === "feedback") { st.phase = "over"; saveScore("loup"); render(); $("main").focus(); } }); }
       else { Limbo.resolve(false); Limbo.wolf(st.err); }
     }
@@ -969,6 +1044,54 @@ var QUESTIONS = [
   /* Fin : la lampe s'illumine, le monde reprend ses couleurs. Pendant ce temps la vidéo Cloudinary se charge. Puis page du thème. */
   /* Préchargement : dès le début du quiz, la vidéo est téléchargée en tâche de fond pour que la page du thème l'ait déjà en cache. */
   var preStarted = false;
+  /* Notification : quand un autre joueur termine (le score arrive dans le Google Sheet), son prénom s'affiche brièvement.
+     Dès la première lecture, on mémorise les joueurs déjà présents : seuls les nouveaux déclenchent une notification. */
+  var watchOn = false, seen = null, tq = [], tBusy = false, watchT = null;
+  var RUSH = ["Dépêche-toi !", "Vite, avance !", "Il te devance !", "Ne traîne pas !", "À ton tour, vite !"], rushI = (Math.random() * RUSH.length) | 0, REC = ["Rattrape-le !", "La couronne change de tête !", "Qui l'arrêtera ?"], lead0 = null, recent = [], recI = 0;
+  function toastNext() {
+    if (tBusy || !tq.length) return; if (cineOn || st.phase === "light" || st.phase === "over") { tq = []; return; }
+    tBusy = true; var it = tq.shift(), nm = it.nm, el = $("gh"), fx = $("ghx"), h = $("ghName");
+    el.classList.toggle("rec", !!it.rec); $("ghSub").textContent = it.rec ? "passe 1er du classement" : "a trouvé le thème";
+    h.textContent = ""; Array.prototype.forEach.call(nm, function (c, k) { var i = document.createElement("i"); i.textContent = c === " " ? "\u00a0" : c; i.style.setProperty("--k", k); h.appendChild(i); });
+    $("ghRush").textContent = it.rec ? REC[rushI++ % REC.length] : RUSH[rushI++ % RUSH.length];
+    el.classList.remove("go"); fx.classList.remove("go"); void el.offsetWidth; el.classList.add("go"); fx.classList.add("go");
+    try { Limbo.flare(); } catch (e) {}
+    setTimeout(function () { try { Limbo.flare(); } catch (e) {} }, 9500);
+    setTimeout(function () { el.classList.remove("go"); fx.classList.remove("go"); tBusy = false; setTimeout(toastNext, 2500); }, 20200);
+  }
+  function watchPull() {
+    var url = window.CPR_CONFIG && CPR_CONFIG.SCORES_URL; if (!url || document.hidden) return;
+    var cb = "cprW" + Date.now(), sc = document.createElement("script"), done = false;
+    function clean() { try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc.parentNode) sc.parentNode.removeChild(sc); }
+    var to = setTimeout(function () { done = true; clean(); }, 9000);
+    window[cb] = function (data) {
+      if (done) return; done = true; clearTimeout(to); clean();
+      var arr = Array.isArray(data) ? data : (data && data.rows); if (!Array.isArray(arr)) return;
+      var me = String(st.name || "").trim().toUpperCase(), first = seen === null; if (first) seen = {};
+      var best = {}, news = [];
+      arr.forEach(function (e) {
+        if (!e) return; var nm = String(e.playerName || e.name || "").trim(); if (!nm) return; var k = nm.toUpperCase();
+        var sc = Number(e.score), t = Number(e.totalTime), ms = (t > 0 && t < 9999) ? t : 9999; if (isNaN(sc)) sc = 0;
+        var c = best[k]; if (!c || sc > c.sc || (sc === c.sc && ms < c.ms)) best[k] = { k: k, nm: nm, sc: sc, ms: ms };
+        if (seen[k]) return; seen[k] = 1; if (!first && k !== me) news.push({ k: k, nm: nm });
+      });
+      var lead = null; for (var q in best) { var p = best[q]; if (!lead || p.sc > lead.sc || (p.sc === lead.sc && p.ms < lead.ms)) lead = p; }
+      var recK = null; if (lead0 !== null && lead && lead.k !== lead0 && lead.k !== me) recK = lead.k; if (lead) lead0 = lead.k;
+      var recDone = false;
+      news.forEach(function (n) { if (tq.length >= 4) return; if (n.k === recK) { tq.push({ nm: n.nm, rec: true }); recDone = true; } else tq.push({ nm: n.nm }); });
+      if (recK && !recDone && tq.length < 4) tq.push({ nm: lead.nm, rec: true });
+      /* derniers joueurs (le plus récent d'abord), hors moi : le fantôme peut les rappeler */
+      recent = []; for (var z = arr.length - 1; z >= 0 && recent.length < 6; z--) { var e2 = arr[z], n2 = e2 && String(e2.playerName || e2.name || "").trim(); if (n2 && n2.toUpperCase() !== me && recent.indexOf(n2) < 0) recent.push(n2); }
+      if (first) recent.slice(0, 2).forEach(function (n) { tq.push({ nm: n }); });
+      toastNext();
+    };
+    sc.onerror = function () { if (done) return; done = true; clearTimeout(to); clean(); };
+    sc.src = url + (url.indexOf("?") < 0 ? "?" : "&") + "action=get&callback=" + cb + "&t=" + Date.now();
+    document.body.appendChild(sc);
+  }
+  function watch() { if (watchOn) return; watchOn = true; watchPull();
+    /* rappel : s'il n'y a rien de neuf, le fantôme repasse régulièrement avec un des derniers joueurs qui ont trouvé le thème */
+    setInterval(function () { if (tBusy || tq.length || !recent.length || document.hidden || cineOn || st.phase === "light" || st.phase === "over" || st.phase === "result") return; tq.push({ nm: recent[recI++ % recent.length] }); toastNext(); }, 40000); watchT = setInterval(function () { if (st.phase === "light" || st.phase === "over") { clearInterval(watchT); return; } watchPull(); }, 7000); }
   function preload() {
     if (preStarted) return; preStarted = true;
     try {
