@@ -99,10 +99,10 @@ body.dawn .back { opacity: 0; transition: opacity 1s; pointer-events: none; }
 .shade, .vig { transition: opacity 1s; }
 /* Annonce cinématique : le conte du Petit Chaperon rouge, en bandes noires de cinéma */
 .cine { position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0; transition: opacity 2s ease; }
-body.cinema .cine { opacity: 1; pointer-events: auto; }
+body.cinema .cine { opacity: 1; pointer-events: auto; transition: opacity 0.5s ease; }
 body.cinema main, body.cinema .back { opacity: 0; pointer-events: none; }
 main, .back { transition: opacity 2s ease; }
-.cine .bar { position: absolute; left: 0; right: 0; background: #000; height: 0; transition: height 3.6s cubic-bezier(.25, .6, .2, 1); }
+.cine .bar { position: absolute; left: 0; right: 0; background: #000; height: 0; transition: height 1.2s cubic-bezier(.25, .6, .2, 1); }
 .cine .bar.t { top: 0; } .cine .bar.b { bottom: 0; }
 body.cinema .cine .bar { height: 13vh; }
 .cine .txt { position: absolute; left: 50%; bottom: 17vh; transform: translateX(-50%); width: min(860px, 88vw); text-align: center; font: italic 400 clamp(1.25rem, 3.1vw, 2.2rem)/1.4 var(--f-title); color: #f4f4f4; text-shadow: 0 2px 18px #000, 0 0 40px rgba(0, 0, 0, 0.9); text-wrap: balance; }
@@ -118,15 +118,19 @@ body.cinema .cine .bar { height: 13vh; }
   -webkit-mask-image: linear-gradient(to bottom, transparent 12%, #000 26%, #000 72%, transparent 86%); mask-image: linear-gradient(to bottom, transparent 12%, #000 26%, #000 72%, transparent 86%); transition: opacity 2s ease; }
 .cine .crawl.out { opacity: 0; }
 .cine .crawl-in { position: absolute; left: 50%; top: 0; width: min(900px, 88vw); margin-left: calc(min(900px, 88vw) / -2); text-align: center; transform-origin: 50% 100%; will-change: transform;
-  font: italic 400 clamp(1.5rem, 3.7vw, 2.7rem)/1.55 var(--f-title); color: #f2f2f2; text-shadow: 0 2px 18px #000; text-wrap: balance; transform: translate3d(0, 110vh, 0) rotateX(9deg); }
+  font: italic 400 clamp(1.5rem, 3.7vw, 2.7rem)/1.55 var(--f-title); color: #f2f2f2; text-shadow: 0 2px 18px #000; text-wrap: balance; transform: translate3d(0, 105vh, 0) rotateX(9deg); }
 .cine .crawl-in p { margin: 0 0 2.2em; }
-.cine .crawl-in .k { font: 400 0.8rem/1.4 var(--f-ui); letter-spacing: 0.38em; text-transform: uppercase; color: #a9a9a9; font-style: normal; }
+.cine .crawl-in .k { font: italic 400 clamp(1.7rem, 5vw, 3rem)/1.2 var(--f-title); letter-spacing: 0.02em; text-transform: none; color: #fff; text-shadow: 0 0 22px rgba(255, 255, 255, 0.4), 0 2px 16px #000; }
 .cine .crawl-in .last { font-size: 1.25em; color: #fff3c4; text-shadow: 0 0 26px rgba(255, 214, 80, 0.55), 0 2px 18px #000; }
 .cine .crawl-in .ttl { position: static; inset: auto; opacity: 1; transition: none; display: grid; justify-items: center; place-content: normal; gap: 14px; margin-top: 7vh; padding-bottom: 6vh; font-style: normal; }
 .cine .crawl.fixed { -webkit-mask-image: none; mask-image: none; perspective: none; }
 .cine .nm { display: grid; gap: 8px; width: min(22rem, 80vw); margin-top: 22px; text-align: left; }
 .cine .nm span { font: 400 0.72rem/1.3 var(--f-ui); letter-spacing: 0.28em; text-transform: uppercase; color: #a9a9a9; }
 .cine .nm input { min-height: 48px; padding: 0 4px; background: transparent; border: 0; border-bottom: 1px solid rgba(233, 233, 233, 0.35); color: #f2f2f2; font: 400 1.2rem/1 var(--f-ui); letter-spacing: 0.04em; border-radius: 0; text-align: center; text-shadow: 0 2px 12px #000; }
+.cine .nm .nmerr { font: 400 0.8rem/1.3 var(--f-ui); font-style: normal; color: #e04a4a; }
+.cine .nm.bad input { border-bottom-color: #e04a4a; }
+.cine .nm, .cine .cgo { opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity 0.7s ease, transform 0.7s ease, visibility 0s; }
+.cine .ttl.ready .nm, .cine .ttl.ready .cgo { opacity: 1; visibility: visible; transform: none; }
 .cine .nm input:focus-visible { outline: none; border-bottom-color: #fff; }
 .cine .cgo { margin-top: 8px; min-height: 50px; padding: 0 30px; border: 1px solid #fff; border-radius: 2px; background: #ececec; color: #0a0a0a; cursor: pointer; font: 400 0.85rem/1 var(--f-ui); letter-spacing: 0.24em; text-transform: uppercase; box-shadow: 0 0 30px rgba(255, 255, 255, 0.35); }
 .cine .cgo:hover, .cine .cgo:focus-visible { background: #fff; outline: none; }
@@ -137,10 +141,10 @@ body.cinema .cine .bar { height: 13vh; }
 body.cinema #bg { transform: scale(1.1); }
 @media (prefers-reduced-motion: reduce) { .cine { display: none; } }
 /* Arrivée : le monde a changé, le brouillard se dissipe */
-#arrive { position: fixed; inset: 0; z-index: 50; pointer-events: none; background: #000; animation: arr 4s ease forwards; }
+#arrive { position: fixed; inset: 0; z-index: 50; pointer-events: none; background: #000; animation: arr 1.6s ease forwards; }
 #arrive .af { position: absolute; inset: -10%; filter: blur(16px);
   background: radial-gradient(60% 50% at 25% 70%, rgba(205,205,205,0.65), transparent 70%), radial-gradient(70% 60% at 80% 40%, rgba(190,190,190,0.55), transparent 72%), radial-gradient(90% 60% at 50% 105%, rgba(215,215,215,0.7), transparent 70%);
-  animation: afog 4s ease forwards; }
+  animation: afog 1.6s ease forwards; }
 @keyframes arr { 0%, 10% { opacity: 1; } 14% { opacity: 0.6; } 18% { opacity: 1; } 30% { opacity: 0.92; } 33% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes afog { 0% { opacity: 0.2; transform: translateX(0); } 35% { opacity: 0.9; } 100% { opacity: 0; transform: translateX(8%) scale(1.15); } }
 @media (prefers-reduced-motion: reduce) { #arrive { display: none; } }
@@ -153,7 +157,7 @@ body.cinema #bg { transform: scale(1.1); }
   <div class="crawl" id="crawl" aria-live="off"><div class="crawl-in" id="crawlIn"></div></div>
   <div class="bar t"></div><div class="bar b"></div>
   <div class="ttl" id="cineTtl"><small>Un quiz de Team Building</small><b>Le Petit <em>Chaperon</em> rouge</b><small>et la forêt sans lumière</small>
-    <label class="nm"><span>Votre prénom (facultatif)</span><input type="text" id="cineName" maxlength="24" autocomplete="off"></label>
+    <label class="nm"><span>Votre prénom</span><input type="text" id="cineName" maxlength="24" autocomplete="off" required><em class="nmerr" id="cineErr" hidden>Entrez votre prénom pour commencer.</em></label>
     <button class="cgo" id="cineGo" type="button">Commencer</button></div>
   <button class="skip" id="cineSkip" type="button">Passer</button>
 </div>
@@ -169,7 +173,7 @@ body.cinema #bg { transform: scale(1.1); }
     <div class="label"><span id="count"></span><span id="secs" aria-hidden="true"></span></div>
     <h1 class="q" id="q"></h1>
     <p class="sub" id="sub"></p>
-    <label class="name" id="nameBox" hidden><span class="label">Votre prénom (facultatif)</span><input type="text" id="name" maxlength="24" autocomplete="off"></label>
+    <label class="name" id="nameBox" hidden><span class="label">Votre prénom (obligatoire)</span><input type="text" id="name" maxlength="24" autocomplete="off"></label>
     <ol class="opts" id="opts"></ol>
     <button class="joker" id="joker" type="button" hidden>Lever la lampe<small>retire 2 mauvaises réponses · une seule fois</small></button>
     <p class="msg" id="msg" role="status" aria-live="polite"></p>
@@ -957,7 +961,7 @@ var QUESTIONS = [
     render(); if (!st.over) $("main").focus();
   }
   $("main").addEventListener("click", function () {
-    if (st.phase === "welcome") { st.name = $("name").value.trim(); ask(); }
+    if (st.phase === "welcome") { var nn = $("name").value.trim(); if (!nn) { try { $("name").focus(); } catch (e) {} $("name").placeholder = "Prénom obligatoire"; return; } st.name = nn; ask(); }
     else if (st.phase === "feedback") { if (st.i === QUESTIONS.length - 1) { st.phase = "result"; render(); } else { st.i++; ask(); } }
     else if (st.phase === "over") { $("main").hidden = true; document.body.style.transition = "opacity 1.2s ease"; document.body.style.opacity = "0"; setTimeout(goTheme, 1250); }
     else if (st.phase === "result") { if (st.score >= QZ_MIN) light(); else { reset(); render(); } }
@@ -1030,11 +1034,15 @@ var QUESTIONS = [
     if (titleOn) return; titleOn = true; cineT.forEach(clearTimeout); cineT = [];
     $("crawl").classList.add("fixed"); $("cineSkip").style.display = "none";
     var inn = $("crawlIn"); inn.style.transform = "translate3d(0," + inn.dataset.yend + "px,0)";
-    setTimeout(function () { try { $("cineName").focus({ preventScroll: true }); } catch (e) {} }, 400);
+    /* à la fin de l'annonce : le champ prénom et « Commencer » apparaissent vite et sont actifs aussitôt */
+    $("cineTtl").classList.add("ready");
+    setTimeout(function () { try { $("cineName").focus({ preventScroll: true }); } catch (e) {} }, 60);
   }
   function startFromTitle() {
     if (!titleOn) return;
-    st.name = $("cineName").value.trim(); $("name").value = st.name;
+    var nm = $("cineName").value.trim();
+    if (!nm) { $("cineErr").hidden = false; $("cineName").parentNode.classList.add("bad"); try { $("cineName").focus(); } catch (e) {} return; }
+    st.name = nm; $("name").value = st.name;
     cineEnd(); ask();
   }
   function cine() {
@@ -1048,14 +1056,15 @@ var QUESTIONS = [
     });
     var ttl = $("cineTtl"); ttl.classList.add("on"); inn.appendChild(ttl);
     /* le texte monte depuis le bas de l'écran ; le titre le suit puis se fige au centre avec le champ prénom */
-    var vh = innerHeight, y0 = vh * 1.1, yend = vh * 0.5 - (ttl.offsetTop + ttl.offsetHeight / 2), dur = 56000;
+    var vh = innerHeight, y0 = vh * 1.05, yin = vh * 0.62, yend = vh * 0.5 - (ttl.offsetTop + ttl.offsetHeight / 2), dur = 52000;
     inn.dataset.yend = yend;
-    cineAt(3800, function () {
+    cineAt(0, function () {
       if (!inn.animate) { arrived(); return; }
       crawlAnim = inn.animate([
-        { transform: "translate3d(0," + y0 + "px,0) rotateX(9deg)" },
-        { transform: "translate3d(0," + yend + "px,0) rotateX(0deg)" }
-      ], { duration: dur, easing: "cubic-bezier(.25,.25,.3,1)", fill: "forwards" });
+        { transform: "translate3d(0," + y0 + "px,0) rotateX(9deg)", offset: 0, easing: "cubic-bezier(.2,.6,.4,1)" },
+        { transform: "translate3d(0," + yin + "px,0) rotateX(8.5deg)", offset: 0.035, easing: "linear" },
+        { transform: "translate3d(0," + yend + "px,0) rotateX(0deg)", offset: 1 }
+      ], { duration: dur, easing: "linear", fill: "forwards" });
       crawlAnim.onfinish = arrived;
       cineAt(dur * 0.38, function () { try { Limbo._ghost(); Limbo.wolf(1); } catch (e) {} });
       cineAt(dur * 0.52, function () { try { Limbo._fire("owl"); } catch (e) {} });
@@ -1065,6 +1074,7 @@ var QUESTIONS = [
   }
   $("cineSkip").addEventListener("click", showTitle);
   $("cineGo").addEventListener("click", startFromTitle);
+  $("cineName").addEventListener("input", function () { $("cineErr").hidden = true; $("cineName").parentNode.classList.remove("bad"); });
   $("cineName").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); startFromTitle(); } });
   document.addEventListener("keydown", function (e) { if (cineOn && !titleOn && e.key === "Escape") { e.preventDefault(); showTitle(); } });
   reset(); render();
