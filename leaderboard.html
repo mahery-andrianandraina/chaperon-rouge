@@ -86,7 +86,7 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
   var TOTAL_DEFAULT = 10, myId = null, loaded = false;
-  var mm = function (ms) { var s = Math.round(ms / 1000), m = Math.floor(s / 60); return m + ":" + ("0" + (s % 60)).slice(-2); };
+  var mm = function (ms) { if (ms >= 9999000) return "—"; var s = Math.round(ms / 1000), m = Math.floor(s / 60); return m + ":" + ("0" + (s % 60)).slice(-2); };
   var rk = function (i) { return i === 0 ? "1er" : (i + 1) + "e"; };
 
   function render(list) {
@@ -104,11 +104,11 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
     });
     var body = $("rows"); body.textContent = "";
     list.forEach(function (p, i) {
-      var tr = document.createElement("tr"); if (p.id && p.id === myId) tr.className = "me";
+      var tr = document.createElement("tr"); if ((p.id && p.id === myId) || (p.key && p.key === myName)) tr.className = "me";
       function td(c, t) { var e = document.createElement("td"); e.className = c; e.textContent = t; tr.appendChild(e); return e; }
       td("rk", rk(i)); td("nm", p.name || "Anonyme"); td("sc", p.score + " / " + (p.total || TOTAL_DEFAULT)); td("tm", mm(p.ms));
-      var o = td("ou", ""); var dot = document.createElement("span"); dot.className = "dot" + (p.outcome === "loup" ? " w" : ""); o.appendChild(dot);
-      o.appendChild(document.createTextNode(p.outcome === "loup" ? "Rattrapé par le loup" : "Lumière rendue"));
+      var o = td("ou", ""); if (p.outcome) { var dot = document.createElement("span"); dot.className = "dot" + (p.outcome === "loup" ? " w" : ""); o.appendChild(dot);
+      o.appendChild(document.createTextNode(p.outcome === "loup" ? "Rattrapé par le loup" : "Lumière rendue")); } else { o.textContent = "—"; }
       body.appendChild(tr);
     });
   }
@@ -126,13 +126,26 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
   try { myId = localStorage.getItem("cpr_pid"); } catch (e) {}
   var URL_ = window.CPR_CONFIG && CPR_CONFIG.SCORES_URL;
   if (!URL_) { $("liveTxt").textContent = "Classement non connecté"; $("note").hidden = false; $("note").textContent = "L'adresse du Google Sheet n'est pas encore renseignée."; offline("Classement non connecté"); return; }
+  /* Format du script Apps Script existant : lecture JSONP (?action=get&callback=...) qui renvoie une liste {playerName, score, totalTime, date}. */
+  function norm(list) {
+    var best = {};
+    list.forEach(function (e) {
+      if (!e) return; var sc = Number(e.score); if (isNaN(sc)) return;
+      var nm = String(e.playerName || e.name || "Anonyme"), t = Number(e.totalTime), key = nm.trim().toUpperCase();
+      var p = { name: nm, score: sc, total: TOTAL_DEFAULT, ms: (t > 0 && t < 9999) ? t * 1000 : 9999000, at: 0, key: key };
+      var c = best[key]; if (!c || p.score > c.score || (p.score === c.score && p.ms < c.ms)) best[key] = p;
+    });
+    var out = []; for (var k in best) out.push(best[k]); return out;
+  }
+  var myName = ""; try { var mb = JSON.parse(localStorage.getItem("cpr_best") || "null"); if (mb && mb.name) myName = String(mb.name).trim().toUpperCase(); } catch (e) {}
   function pull() {
-    var ctrl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctrl) ctrl.abort(); }, 12000);
-    fetch(URL_ + (URL_.indexOf("?") < 0 ? "?" : "&") + "t=" + Date.now(), ctrl ? { signal: ctrl.signal } : {}).then(function (r) { return r.json(); }).then(function (j) {
-      clearTimeout(to);
-      if (!j || !j.ok || !Array.isArray(j.rows)) throw new Error("bad");
-      render(j.rows.filter(function (v) { return v && typeof v.score === "number" && !isNaN(v.score); }));
-    }).catch(function () { clearTimeout(to); if (!loaded) offline(); });
+    var cb = "gsCb" + Date.now(), sc = document.createElement("script"), done = false;
+    function clean() { try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc.parentNode) sc.parentNode.removeChild(sc); }
+    var to = setTimeout(function () { if (done) return; done = true; clean(); if (!loaded) offline(); }, 12000);
+    window[cb] = function (data) { if (done) return; done = true; clearTimeout(to); clean(); var arr = Array.isArray(data) ? data : (data && Array.isArray(data.rows) ? data.rows : null); if (!arr) { if (!loaded) offline(); return; } render(norm(arr)); };
+    sc.onerror = function () { if (done) return; done = true; clearTimeout(to); clean(); if (!loaded) offline(); };
+    sc.src = URL_ + (URL_.indexOf("?") < 0 ? "?" : "&") + "action=get&callback=" + cb + "&t=" + Date.now();
+    document.body.appendChild(sc);
   }
   pull(); setInterval(function () { if (!document.hidden) pull(); }, 15000);
 })();
