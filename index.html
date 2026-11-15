@@ -375,6 +375,10 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; }
 .sh-tear { position: absolute; inset: auto; left: 0; right: 0; backdrop-filter: invert(1) contrast(1.6); -webkit-backdrop-filter: invert(1) contrast(1.6); }
 .stage.sh-shake { translate: var(--sx, 0) var(--sy, 0); }
 @media (prefers-reduced-motion: reduce) { #shFx { display: none !important; } }
+.btn-flee { position: relative; z-index: 5; border-style: dashed; color: var(--bone-dim); opacity: 0.7; cursor: not-allowed; transition: transform 0.28s cubic-bezier(.2, .9, .3, 1.2), opacity 0.2s; will-change: transform; }
+.btn-flee:hover { border-color: var(--line); }
+#fireflies { position: absolute; inset: 0; z-index: 4; width: 100%; height: 100%; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { #fireflies { display: none; } }
 </style>
 </head>
 <body>
@@ -382,6 +386,7 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; }
   <canvas id="bg3d" aria-hidden="true"></canvas>
   <div class="nshade" aria-hidden="true"></div>
   <div class="grain"></div>
+  <canvas id="fireflies" aria-hidden="true"></canvas>
   <div class="flash" id="flash"></div>
   <div class="wipe" id="wipe"></div>
 
@@ -395,7 +400,7 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; }
         <span class="label"><b>Version test</b> · intro cinématique</span>
         <h1 class="display idle-title">Précédemment…</h1>
         <p class="lede">Les thèmes passés, avec l'annonce faite sur Teams et les commentaires de chacun. Puis le nouveau jeu.</p>
-        <div class="row"><button class="btn primary" id="btnStart" type="button">Lancer l'intro</button></div>
+        <div class="row"><button class="btn primary" id="btnStart" type="button">Lancer l'intro</button><button class="btn btn-flee" id="btnFlee" type="button" aria-disabled="true" tabindex="-1" title="Pas si vite…">Voir directement le thème</button></div>
         <span class="label note">Thèmes et commentaires repris de commentaire.xlsx. Les photos des thèmes restent à ajouter.</span>
       </div>
       <div class="col-side">
@@ -1334,6 +1339,29 @@ function startNight3D() {
 
   /* ----- Commandes ----- */
   $("btnStart").addEventListener("click", start);
+  /* Bouton « Voir directement le thème » : pas cliquable, il s'esquive quand le curseur (ou le doigt) s'approche. */
+  (function () {
+    var fb = $("btnFlee"), ox = 0, oy = 0, R = 130;
+    function away(e) {
+      if (body.dataset.mode !== "idle") return;
+      var r = fb.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      var nx = Math.max(r.left - e.clientX, 0, e.clientX - r.right), ny = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom), d = Math.sqrt(nx * nx + ny * ny);
+      if (d > R) { return; }
+      var dx = cx - e.clientX, dy = cy - e.clientY, L = Math.sqrt(dx * dx + dy * dy) || 1, push = R - d + 60;
+      var mx = dx / L * push, my = dy / L * push;
+      var st = document.getElementById("stage").getBoundingClientRect(), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--bar")) || 60;
+      var minX = st.left + 8, maxX = st.right - r.width - 8, minY = st.top + bar + 8, maxY = st.bottom - bar - r.height - 8;
+      var X = Math.min(maxX, Math.max(minX, r.left + mx)), Y = Math.min(maxY, Math.max(minY, r.top + my));
+      /* coincé contre un bord : il saute de l'autre côté */
+      if (Math.abs(X - (r.left + mx)) > 20 || Math.abs(Y - (r.top + my)) > 20) { X = minX + Math.random() * (maxX - minX); Y = minY + Math.random() * (maxY - minY); }
+      ox += X - r.left; oy += Y - r.top; fb.style.transform = "translate(" + Math.round(ox) + "px," + Math.round(oy) + "px)";
+    }
+    window.addEventListener("pointermove", away);
+    window.addEventListener("pointerdown", away);
+    fb.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); });
+    function home() { ox = 0; oy = 0; fb.style.transform = ""; }
+    var sm = setMode; setMode = function (m) { sm(m); if (m !== "idle") home(); };
+  })();
   $("btnReplay").addEventListener("click", start);
   var confirmTimer = null;
   function resetReveal() {
@@ -1458,6 +1486,38 @@ function startNight3D() {
   });
 
   setMode("idle");
+})();
+</script>
+<script>
+/* Lucioles : quelques points dorés flottent dans la scène et se rapprochent doucement du curseur ou du doigt. */
+(function () {
+  var cv = document.getElementById("fireflies"); if (!cv || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+  var g = cv.getContext("2d"), W = 0, H = 0, DPR = Math.min(2, window.devicePixelRatio || 1), P = { x: -1, y: -1, on: false, t: 0 }, F = [], N = 16, last = 0;
+  function size() { W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.ceil(W * DPR); cv.height = Math.ceil(H * DPR); g.setTransform(DPR, 0, 0, DPR, 0, 0); }
+  function init() { F = []; for (var i = 0; i < N; i++) F.push({ x: Math.random() * W, y: Math.random() * H, vx: 0, vy: 0, a: Math.random() * 6.28, s: 0.6 + Math.random() * 0.9, r: 1.2 + Math.random() * 1.8, p: Math.random() * 6.28, ro: 22 + Math.random() * 46, th: Math.random() * 6.28, w: (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random() * 0.9) }); }
+  size(); init(); window.addEventListener("resize", function () { size(); init(); });
+  window.addEventListener("pointermove", function (e) { var r = cv.getBoundingClientRect(); P.x = e.clientX - r.left; P.y = e.clientY - r.top; P.on = true; P.t = performance.now(); });
+  document.addEventListener("pointerleave", function () { P.on = false; });
+  function frame(t) {
+    requestAnimationFrame(frame); if (document.hidden) return; var dt = Math.min(0.05, (t - last) / 1000 || 0.016); last = t;
+    g.clearRect(0, 0, W, H);
+    for (var i = 0; i < F.length; i++) {
+      var f = F[i]; f.a += (Math.random() - 0.5) * 0.6 * dt * 6; f.p += dt * 2.4;
+      var ax = Math.cos(f.a) * 18, ay = Math.sin(f.a) * 18;
+      var still = P.on && (t - P.t) > 700;
+      if (still) {
+        /* curseur immobile : les lucioles se regroupent et tournent autour du curseur */
+        f.th += f.w * dt; var tx = P.x + Math.cos(f.th) * f.ro, ty = P.y + Math.sin(f.th) * f.ro * 0.8;
+        ax = (tx - f.x) * 7; ay = (ty - f.y) * 7;
+      } else if (P.on) { var dx = P.x - f.x, dy = P.y - f.y, d = Math.sqrt(dx * dx + dy * dy) || 1, k = d > 90 ? 38 : -22; ax += dx / d * k; ay += dy / d * k; }
+      f.vx += ax * dt * f.s; f.vy += ay * dt * f.s; var dm = still ? 0.9 : 0.96; f.vx *= dm; f.vy *= dm; f.x += f.vx * dt * 3; f.y += f.vy * dt * 3;
+      if (f.x < -20) f.x = W + 20; if (f.x > W + 20) f.x = -20; if (f.y < -20) f.y = H + 20; if (f.y > H + 20) f.y = -20;
+      var al = (still ? 0.55 : 0.35) + 0.45 * (0.5 + 0.5 * Math.sin(f.p)), gr = g.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * 7);
+      gr.addColorStop(0, "rgba(255,226,140," + al + ")"); gr.addColorStop(0.25, "rgba(255,200,90," + al * 0.45 + ")"); gr.addColorStop(1, "rgba(255,190,60,0)");
+      g.fillStyle = gr; g.beginPath(); g.arc(f.x, f.y, f.r * 7, 0, 6.2832); g.fill();
+    }
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
