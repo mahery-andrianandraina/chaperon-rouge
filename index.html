@@ -375,8 +375,28 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; }
 .sh-tear { position: absolute; inset: auto; left: 0; right: 0; backdrop-filter: invert(1) contrast(1.6); -webkit-backdrop-filter: invert(1) contrast(1.6); }
 .stage.sh-shake { translate: var(--sx, 0) var(--sy, 0); }
 @media (prefers-reduced-motion: reduce) { #shFx { display: none !important; } }
-.btn-flee { position: relative; z-index: 5; border-style: dashed; color: var(--bone-dim); opacity: 0.7; cursor: not-allowed; transition: transform 0.28s cubic-bezier(.2, .9, .3, 1.2), opacity 0.2s; will-change: transform; }
-.btn-flee:hover { border-color: var(--line); }
+.btn-flee { position: relative; z-index: 5; color: #1a1205; font-weight: 700; background: linear-gradient(135deg, #ffe08a, #e8b64a 55%, #ffd25a); border-color: #ffe08a; cursor: pointer; box-shadow: 0 0 26px rgba(255, 210, 90, 0.55); transition: background 0.2s; will-change: transform; overflow: hidden; }
+.btn-flee::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.75), transparent); transform: skewX(-20deg); animation: fleeshine 2.6s ease-in-out infinite; }
+.haha { position: fixed; z-index: 9; pointer-events: none; font-size: 1.9rem; line-height: 1; opacity: 0; animation: hahaup 2.6s ease-out forwards; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5)); }
+@keyframes hahaup { 0% { opacity: 0; transform: translate(0, 0) scale(0.5); } 10% { opacity: 1; transform: translate(0, -20px) scale(1.15); } 30% { transform: translate(calc(var(--dx) * 0.7), -90px) scale(1.2); } 55% { opacity: 1; transform: translate(calc(var(--dx) * -0.5), -170px) scale(1.25); } 100% { opacity: 0; transform: translate(calc(var(--dx) * 0.8), -300px) scale(1.4); } }
+#fbLive { position: fixed; z-index: 9; left: 16px; bottom: calc(var(--bar) + 112px); width: min(340px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.fbc { display: flex; gap: 9px; align-items: flex-start; padding: 7px 14px 8px 8px; border-radius: 18px; background: rgba(12, 12, 20, 0.62); backdrop-filter: blur(6px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35); color: #f4f4f4; font: 400 0.86rem/1.3 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; animation: fbin 0.32s cubic-bezier(.2, .9, .3, 1.1) both; width: fit-content; max-width: 100%; }
+.fbc.out { animation: fbout 0.45s ease forwards; }
+.fbc .av { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 400 1.05rem/1 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.35); }
+.fbc b { display: block; font-weight: 700; font-size: 0.78rem; color: #fff; }
+.fbc span.tx { display: block; color: #ececec; overflow-wrap: anywhere; }
+@keyframes fbin { from { opacity: 0; transform: translateY(14px) scale(0.96); } }
+@keyframes fbout { to { opacity: 0; transform: translateY(-6px); } }
+#fbBadge { position: fixed; z-index: 9; left: 16px; top: calc(var(--bar) + 12px); display: flex; gap: 8px; align-items: center; pointer-events: none; opacity: 0; transform: translateY(-6px); transition: opacity 0.3s, transform 0.3s; font: 700 0.7rem/1 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: 0.12em; color: #fff; }
+#fbBadge.show { opacity: 1; transform: none; }
+#fbBadge i { font-style: normal; padding: 5px 9px; border-radius: 5px; background: #e0245e; box-shadow: 0 0 14px rgba(224, 36, 94, 0.6); }
+#fbBadge i::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #fff; animation: fbdot 1s ease-in-out infinite; }
+@keyframes fbdot { 50% { opacity: 0.25; } }
+#fbBadge em { font-style: normal; padding: 5px 9px; border-radius: 5px; background: rgba(0, 0, 0, 0.55); }
+@media (prefers-reduced-motion: reduce) { .haha { display: none; } .fbc { animation: none; } }
+.btn-flee:hover { background: linear-gradient(135deg, #fff0b8, #f0c050 55%, #ffe08a); }
+@keyframes fleeshine { 0% { left: -60%; } 55%, 100% { left: 130%; } }
+@media (prefers-reduced-motion: reduce) { .btn-flee, .btn-flee::after { animation: none; } }
 #fireflies { position: absolute; inset: 0; z-index: 4; width: 100%; height: 100%; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { #fireflies { display: none; } }
 </style>
@@ -503,6 +523,8 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; }
 </div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="shWarp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="shTurb" type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="3" result="n"/><feDisplacementMap id="shDisp" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+<div id="fbBadge" aria-hidden="true"><i>EN DIRECT</i><em id="fbViews">👁 128</em></div>
+<div id="fbLive" role="log" aria-live="polite"></div>
 <div id="shFx" hidden aria-hidden="true">
   <div class="sh-fog"></div>
   <canvas id="shAsh"></canvas>
@@ -1339,28 +1361,87 @@ function startNight3D() {
 
   /* ----- Commandes ----- */
   $("btnStart").addEventListener("click", start);
-  /* Bouton « Voir directement le thème » : pas cliquable, il s'esquive quand le curseur (ou le doigt) s'approche. */
+  /* Bouton « Voir directement le thème » : on ne l'offre pas, il se mérite. Il n'est pas cliquable et s'écarte avant que le curseur ne l'atteigne ;
+     à chaque esquive, des 😂 montent comme dans un direct et un message rappelle qu'il faut jouer. */
   (function () {
-    var fb = $("btnFlee"), ox = 0, oy = 0, R = 130;
+    var fb = $("btnFlee"), ox = 0, oy = 0, R = 120, MAXD = 64, MAXH = 150, back = null, lastE = 0;
+    var EMO = ["😂", "🤣", "😂", "😆", "🤣"];
+    /* mouvement par ressort : la position visible suit la cible sans à-coups, même quand la cible change à chaque mouvement du curseur */
+    var curX = 0, curY = 0, vx = 0, vy = 0, raf = 0, lastT = 0;
+    function step(t) {
+      var dt = Math.min(0.033, (t - lastT) / 1000 || 0.016); lastT = t;
+      var K = 330, C = 33;
+      vx += ((ox - curX) * K - vx * C) * dt; vy += ((oy - curY) * K - vy * C) * dt; curX += vx * dt; curY += vy * dt;
+      fb.style.transform = "translate3d(" + curX.toFixed(2) + "px," + curY.toFixed(2) + "px,0)";
+      if (Math.abs(ox - curX) + Math.abs(oy - curY) + Math.abs(vx) + Math.abs(vy) > 0.15) raf = requestAnimationFrame(step); else { raf = 0; curX = ox; curY = oy; fb.style.transform = ox || oy ? "translate3d(" + ox + "px," + oy + "px,0)" : ""; }
+    }
+    function put() { if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(step); } }
+    var NAMES = [["Ariel", "#17a2a2", "🐚"], ["Belle", "#e8b64a", "🌹"], ["Jasmine", "#1ab5a8", "🪔"], ["Elsa", "#7ec8f2", "❄️"], ["Raiponce", "#b07be0", "🪻"], ["Mulan", "#d8403a", "🌸"], ["Vaiana", "#2f9fd6", "🌊"], ["Cendrillon", "#5b8def", "👠"], ["Mérida", "#e07a2f", "🏹"], ["Aurore", "#f08ab0", "🎀"], ["Blanche-Neige", "#c23a3a", "🍎"], ["Tiana", "#5aa83c", "🐸"], ["Anna", "#d86a8a", "🧣"], ["Pocahontas", "#3f9a6a", "🍃"]];
+    var CMT = ["Hahaha il se sauve ! 😂", "Ça se mérite, joue d'abord !", "Il ne s'offre pas, il se gagne 😆", "Raté ! Lance l'intro 🤣", "Pas de raccourci pour toi 😂", "Va jouer au quiz, tricheur !", "Il court plus vite que toi 🤣", "Mdr joue d'abord !", "Le thème, il faut le mériter 😂", "Même pas en rêve 🤭", "Allez, au quiz !"];
+    var lastC = 0, ci = -1, ni = (Math.random() * NAMES.length) | 0, views = 128, badgeT = null;
+    /* les commentaires s'affichent dans la zone vide à droite du bouton (entre le texte et la liste des épisodes) */
+    function placeFeed() {
+      var box = $("fbLive"), side = document.querySelector("#sceneIdle .col-side");
+      if (innerWidth < 900 || !side) { box.style.left = box.style.width = ""; return; }
+      var H = homeRect(), left = H.l + H.w + 26, sl = side.getBoundingClientRect().left, w = Math.min(330, sl - left - 18);
+      if (w < 200) { box.style.left = box.style.width = ""; return; }
+      box.style.left = Math.round(left) + "px"; box.style.width = Math.round(w) + "px"; box.style.bottom = "calc(var(--bar) + 48px)";
+    }
+    function comment() {
+      placeFeed();
+      var box = $("fbLive"), nm = NAMES[ni++ % NAMES.length], k; do { k = (Math.random() * CMT.length) | 0; } while (k === ci); ci = k;
+      var c = document.createElement("div"); c.className = "fbc";
+      var av = document.createElement("span"); av.className = "av"; av.style.background = "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.45), " + nm[1] + " 62%)"; av.textContent = nm[2];
+      var w = document.createElement("div"), b = document.createElement("b"), t = document.createElement("span"); t.className = "tx"; b.textContent = nm[0]; t.textContent = CMT[k]; w.appendChild(b); w.appendChild(t); c.appendChild(av); c.appendChild(w);
+      box.appendChild(c); while (box.children.length > 4) box.removeChild(box.firstChild);
+      setTimeout(function () { c.classList.add("out"); setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 480); }, 5200);
+    }
+    function react() {
+      var now = performance.now(), r = fb.getBoundingClientRect();
+      if (now - lastE > 210) {
+        lastE = now; var h = document.createElement("span"); h.className = "haha"; h.textContent = EMO[(Math.random() * EMO.length) | 0];
+        /* les réactions montent sur le côté droit, comme dans un direct */
+        h.style.right = (22 + Math.random() * 54) + "px"; h.style.bottom = "calc(var(--bar) + 14px)"; h.style.setProperty("--dx", ((Math.random() - 0.5) * 90).toFixed(0) + "px");
+        document.body.appendChild(h); h.addEventListener("animationend", function () { h.remove(); });
+      }
+      if (now - lastC > 1050) { lastC = now; comment(); views += 1 + ((Math.random() * 4) | 0); $("fbViews").textContent = "👁 " + views; }
+      var bd = $("fbBadge"); bd.classList.add("show"); clearTimeout(badgeT); badgeT = setTimeout(function () { bd.classList.remove("show"); }, 6000);
+    }
+    /* position d'origine du bouton (sans décalage) */
+    function homeRect() { var r = fb.getBoundingClientRect(); return { l: r.left - curX, t: r.top - curY, w: r.width, h: r.height }; }
+    var seenMove = false;
     function away(e) {
       if (body.dataset.mode !== "idle") return;
-      var r = fb.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      var r = fb.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, H = homeRect();
       var nx = Math.max(r.left - e.clientX, 0, e.clientX - r.right), ny = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom), d = Math.sqrt(nx * nx + ny * ny);
-      if (d > R) { return; }
-      var dx = cx - e.clientX, dy = cy - e.clientY, L = Math.sqrt(dx * dx + dy * dy) || 1, push = R - d + 60;
-      var mx = dx / L * push, my = dy / L * push;
-      var st = document.getElementById("stage").getBoundingClientRect(), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--bar")) || 60;
-      var minX = st.left + 8, maxX = st.right - r.width - 8, minY = st.top + bar + 8, maxY = st.bottom - bar - r.height - 8;
-      var X = Math.min(maxX, Math.max(minX, r.left + mx)), Y = Math.min(maxY, Math.max(minY, r.top + my));
-      /* coincé contre un bord : il saute de l'autre côté */
-      if (Math.abs(X - (r.left + mx)) > 20 || Math.abs(Y - (r.top + my)) > 20) { X = minX + Math.random() * (maxX - minX); Y = minY + Math.random() * (maxY - minY); }
-      ox += X - r.left; oy += Y - r.top; fb.style.transform = "translate(" + Math.round(ox) + "px," + Math.round(oy) + "px)";
+      clearTimeout(back); back = setTimeout(home, 1500);
+      var st = $("stage").getBoundingClientRect(), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--bar")) || 60;
+      var minX = st.left + 8, maxX = st.right - r.width - 8, minY = st.top + bar + 8, maxY = st.bottom - bar - r.height - 8, hop = d < 64;
+      if (hop) {
+        /* le curseur est tout près : le bouton saute sur la position libre la plus proche (autour du curseur, loin de lui), sans trop s'éloigner de sa place */
+        var D = Math.sqrt(r.width * r.width + r.height * r.height) / 2 + 46, best = null, bd = 1e9;
+        for (var pass = 0; pass < 2 && !best; pass++) {
+          var maxHome = pass === 0 ? 190 : 340;
+          for (var k = 0; k < 24; k++) {
+            var an = k * Math.PI / 12, px = e.clientX + Math.cos(an) * D * 1.6 - r.width / 2, py = e.clientY + Math.sin(an) * D * 0.8 - r.height / 2;
+            if (px < minX || px > maxX || py < minY || py > maxY) continue;
+            var hx = px - H.l, hy = py - H.t, hd = Math.sqrt(hx * hx + hy * hy); if (hd > maxHome) continue;
+            var mv = Math.abs(px - r.left) + 2.5 * Math.abs(py - r.top); if (mv < bd) { bd = mv; best = [hx, hy]; }
+          }
+        }
+        if (best) { ox = best[0]; oy = best[1]; } else { ox = 0; oy = 0; }
+      } else {
+        var dx = cx - e.clientX, dy = cy - e.clientY, L = Math.sqrt(dx * dx + dy * dy) || 1, push = (R - d) * 0.3 + 4;
+        ox += dx / L * push; oy += dy / L * push * 0.7;
+        var m = Math.sqrt(ox * ox + oy * oy); if (m > MAXD) { ox = ox / m * MAXD; oy = oy / m * MAXD; }
+        ox = Math.max(minX - H.l, Math.min(maxX - H.l, ox)); oy = Math.max(minY - H.t, Math.min(maxY - H.t, oy));
+      }
+      put(); react();
     }
-    window.addEventListener("pointermove", away);
-    window.addEventListener("pointerdown", away);
-    fb.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); });
-    function home() { ox = 0; oy = 0; fb.style.transform = ""; }
-    var sm = setMode; setMode = function (m) { sm(m); if (m !== "idle") home(); };
+    /* il ne réagit qu'à une tentative de clic (appui sur le bouton, souris ou doigt) : il s'esquive, les commentaires et les réactions démarrent */
+    fb.addEventListener("pointerdown", function (e) { e.preventDefault(); away(e); });
+    function home() { ox = 0; oy = 0; put(); }
+    var sm = setMode; setMode = function (m) { sm(m); if (m !== "idle") { clearTimeout(back); ox = 0; oy = 0; curX = curY = vx = vy = 0; cancelAnimationFrame(raf); raf = 0; fb.style.transform = ""; $("fbBadge").classList.remove("show"); } };
   })();
   $("btnReplay").addEventListener("click", start);
   var confirmTimer = null;
