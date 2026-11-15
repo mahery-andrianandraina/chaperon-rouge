@@ -993,7 +993,7 @@ var QUESTIONS = [
     if (!url) return;
     try { fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ playerName: rec.name, totalTime: Math.max(1, Math.round(rec.ms / 1000)) }, rec)), keepalive: true }).catch(function () {}); } catch (e) {}
   }
-  function goTheme() { location.href = "theme.html?v=" + encodeURIComponent(VIDEO_URL) + "&t=" + encodeURIComponent(THEME); }
+  function goTheme() { location.href = "theme.html?v=" + encodeURIComponent(VIDEO_URL) + "&t=" + encodeURIComponent(THEME) + "&n=" + encodeURIComponent(st.name || "") + "&s=" + (st.score | 0) + "&o=" + QUESTIONS.length + "&ms=" + Math.round(st.ms || 0); }
   function light() {
     st.phase = "light"; clearT(); document.body.classList.add("dawn"); saveScore("lumiere");
     $("main").hidden = true; $("again").hidden = true;
