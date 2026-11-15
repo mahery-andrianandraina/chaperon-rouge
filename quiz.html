@@ -987,7 +987,7 @@ var QUESTIONS = [
     try { var b = JSON.parse(localStorage.getItem("cpr_best") || "null"); if (!b || rec.score > b.score || (rec.score === b.score && rec.ms < b.ms)) localStorage.setItem("cpr_best", JSON.stringify(rec)); } catch (e) {}
     var url = window.CPR_CONFIG && CPR_CONFIG.SCORES_URL;
     if (!url) return;
-    try { fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(rec), keepalive: true }).catch(function () {}); } catch (e) {}
+    try { fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ playerName: rec.name, totalTime: Math.max(1, Math.round(rec.ms / 1000)) }, rec)), keepalive: true }).catch(function () {}); } catch (e) {}
   }
   function goTheme() { location.href = "theme.html?v=" + encodeURIComponent(VIDEO_URL) + "&t=" + encodeURIComponent(THEME); }
   function light() {
