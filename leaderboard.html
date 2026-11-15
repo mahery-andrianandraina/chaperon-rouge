@@ -11,52 +11,67 @@
 :root { --f-title: "IM Fell DW Pica", Georgia, serif; --f-ui: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif; --paper: #f2f2f2; --dim: #9a9a9a; --line: rgba(255, 255, 255, 0.16); color-scheme: dark; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { margin: 0; min-height: 100%; background: #070809; color: var(--paper); font-family: var(--f-ui); }
-body { min-height: 100vh; position: relative; overflow-x: hidden; }
+html, body { margin: 0; height: 100%; background: #070809; color: var(--paper); font-family: var(--f-ui); overflow: hidden; }
+body { height: 100vh; height: 100dvh; position: relative; }
 /* Décor : forêt de la nuit, lueur de la lampe */
 .bg { position: fixed; inset: 0; z-index: 0; background:
   radial-gradient(60% 45% at 50% 0%, rgba(255, 214, 90, 0.22), transparent 70%),
   repeating-linear-gradient(90deg, transparent 0 46px, rgba(255, 255, 255, 0.025) 46px 49px, transparent 49px 120px, rgba(255, 255, 255, 0.04) 120px 122px),
   linear-gradient(180deg, #17191c 0%, #0b0c0e 60%, #050505 100%); }
-.bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, transparent 35%, rgba(0, 0, 0, 0.75) 100%); }
+.bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 46%, transparent 30%, rgba(0, 0, 0, 0.78) 100%); }
 .back { position: fixed; z-index: 5; top: 14px; left: 18px; min-height: 44px; display: inline-flex; align-items: center; color: var(--dim); text-decoration: none; font: 400 0.72rem/1 var(--f-ui); letter-spacing: 0.26em; text-transform: uppercase; }
+.projb { position: fixed; z-index: 5; top: 14px; right: 18px; min-height: 44px; padding: 0 14px; background: transparent; border: 1px solid var(--line); color: var(--dim); font: 400 0.72rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer; }
+.projb:hover, .projb:focus-visible { color: #fff; border-color: #ffd25a; outline: none; }
+body.proj .back, body.proj .acts { display: none; }
+body.proj main { zoom: 1.3; height: 100%; width: min(1300px, 100%); padding-top: 22px; }
+body.proj .projb { top: auto; bottom: 12px; opacity: 0.35; } body.proj .projb:hover { opacity: 1; }
+body.proj .rest { scrollbar-width: none; } body.proj .rest::-webkit-scrollbar { display: none; }
 .back:hover, .back:focus-visible { color: #fff; outline: none; text-decoration: underline; text-underline-offset: 6px; }
-main { position: relative; z-index: 2; width: min(860px, 100%); margin: 0 auto; padding: 72px 20px 60px; }
-.k { margin: 0 0 10px; font: 400 0.78rem/1.3 var(--f-ui); letter-spacing: 0.34em; text-transform: uppercase; color: var(--dim); }
-h1 { margin: 0 0 6px; font: italic 400 clamp(2.4rem, 8vw, 4.6rem)/1.05 var(--f-title); text-shadow: 0 0 40px rgba(255, 214, 90, 0.25); }
+main { position: relative; z-index: 2; width: min(980px, 100%); height: 100%; margin: 0 auto; padding: clamp(46px, 7vh, 62px) 20px clamp(12px, 2.4vh, 22px); display: flex; flex-direction: column; min-height: 0; }
+.head { flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.k { margin: 0; font: 400 0.74rem/1.3 var(--f-ui); letter-spacing: 0.34em; text-transform: uppercase; color: var(--dim); }
+h1 { margin: 2px 0 0; font: italic 400 clamp(1.9rem, min(7vw, 6.6vh), 3.6rem)/1.05 var(--f-title); text-shadow: 0 0 40px rgba(255, 214, 90, 0.25); }
 h1 em { color: #d3231d; }
-.sub { margin: 0 0 28px; color: #c9c9c9; font-weight: 300; font-size: 1.02rem; line-height: 1.5; }
-.live { display: inline-flex; align-items: center; gap: 8px; font: 400 0.7rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); margin-bottom: 18px; }
+.live { display: inline-flex; align-items: center; gap: 8px; font: 400 0.7rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); }
 .live i { width: 8px; height: 8px; border-radius: 50%; background: #ffd25a; box-shadow: 0 0 12px #ffd25a; animation: bl 2.4s ease-in-out infinite; }
 @keyframes bl { 50% { opacity: 0.3; } }
-.podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 6px 0 26px; align-items: end; }
-.pod { border: 1px solid var(--line); background: rgba(255, 255, 255, 0.04); padding: 16px 14px 14px; text-align: center; min-width: 0; position: relative; }
-.pod .r { font: italic 400 2.6rem/1 var(--f-title); }
-.pod .n { margin: 8px 0 4px; font: italic 400 1.35rem/1.2 var(--f-title); overflow-wrap: anywhere; }
-.pod .s { font: 400 0.8rem/1.3 var(--f-ui); letter-spacing: 0.12em; color: #d7d7d7; }
-.pod.p1 { order: 2; padding-top: 28px; padding-bottom: 22px; border-color: rgba(255, 214, 90, 0.7); background: rgba(255, 214, 90, 0.08); box-shadow: 0 0 46px rgba(255, 200, 60, 0.22); }
-.pod.p1 .r { color: #ffd25a; font-size: 3.4rem; }
-.pod.p2 { order: 1; } .pod.p3 { order: 3; }
-.pod.p2 .r { color: #d9d9d9; } .pod.p3 .r { color: #c98c5a; }
-.pod:empty { visibility: hidden; }
-table { width: 100%; border-collapse: collapse; }
-caption { text-align: left; font: 400 0.72rem/1 var(--f-ui); letter-spacing: 0.26em; text-transform: uppercase; color: var(--dim); padding-bottom: 10px; }
-th { text-align: left; font: 400 0.68rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); padding: 10px 8px; border-bottom: 1px solid var(--line); }
-td { padding: 14px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-size: 1.02rem; vertical-align: middle; }
-td.rk { width: 56px; font: italic 400 1.5rem/1 var(--f-title); color: #cfcfcf; }
-td.nm { font: italic 400 1.35rem/1.2 var(--f-title); overflow-wrap: anywhere; }
-td.sc, td.tm { white-space: nowrap; font-variant-numeric: tabular-nums; }
-td.ou { color: #bdbdbd; font-size: 0.86rem; }
-tr.me td { background: rgba(255, 214, 90, 0.1); }
-tr.me td.nm::after { content: "  · vous"; font: 400 0.7rem/1 var(--f-ui); letter-spacing: 0.2em; text-transform: uppercase; color: #ffd25a; }
-.ou .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; background: #ffd25a; box-shadow: 0 0 8px #ffd25a; }
-.ou .dot.w { background: #d3231d; box-shadow: 0 0 8px #d3231d; }
-.empty { padding: 42px 0; text-align: center; font: italic 400 1.35rem/1.5 var(--f-title); color: #cfcfcf; }
-.note { margin-top: 22px; color: var(--dim); font-size: 0.86rem; line-height: 1.6; }
-.btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; margin-top: 22px; border: 1px solid #fff; border-radius: 2px; background: #ececec; color: #0a0a0a; text-decoration: none; font: 400 0.82rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; }
+/* Tous les joueurs sur un seul écran : podium compact + liste en colonnes qui s'adapte au nombre de joueurs */
+.podium { flex: none; height: clamp(76px, 14.5vh, 124px); display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(6px, 1.2vw, 12px); align-items: end; margin: clamp(8px, 1.6vh, 14px) 0 clamp(8px, 1.6vh, 12px); }
+/* Marches de pierre dans la brume de la forêt ; la lampe dorée éclaire la première, un liseré rouge rappelle la cape */
+.pod { position: relative; display: flex; align-items: center; justify-content: center; gap: clamp(8px, 1.4vw, 14px); padding: 0 12px; min-width: 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.12); border-bottom: 0; border-top: 2px solid #b3151c;
+  background: linear-gradient(180deg, rgba(70, 70, 70, 0.85), rgba(14, 14, 14, 0.95)); opacity: 0; transform: translateY(16px); transition: opacity 0.9s ease, transform 0.9s cubic-bezier(.2,.7,.3,1); }
+.pod.in { opacity: 1; transform: none; }
+.pod.p1 { order: 2; height: 100%; border-top-color: #ffd25a; background: radial-gradient(90% 120% at 50% 0%, rgba(255, 210, 90, 0.42), transparent 70%), linear-gradient(180deg, rgba(86, 80, 60, 0.9), rgba(14, 14, 14, 0.95)); box-shadow: 0 -10px 46px rgba(255, 200, 60, 0.24); }
+.pod.p2 { order: 1; height: 82%; } .pod.p3 { order: 3; height: 66%; }
+.pod .r { font: italic 400 clamp(1.5rem, 4.6vh, 2.5rem)/1 var(--f-title); flex: none; }
+.pod.p1 .r { color: #ffd25a; text-shadow: 0 0 22px rgba(255, 210, 90, 0.7); } .pod.p2 .r { color: #dcdcdc; } .pod.p3 .r { color: #c98c5a; }
+.pod .tx { min-width: 0; text-align: left; }
+.pod .n { font: italic 400 clamp(0.95rem, min(2.8vh, 4.6vw), 1.5rem)/1.15 var(--f-title); color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pod .s { margin-top: 2px; font: 400 clamp(0.62rem, min(1.5vh, 3vw), 0.8rem)/1.3 var(--f-ui); letter-spacing: 0.08em; color: #cfcfcf; white-space: nowrap; }
+@media (max-width: 560px) { .podium { height: clamp(104px, 17vh, 140px); } .pod { flex-direction: column; justify-content: flex-start; gap: 0; padding: 6px 6px 0; } .pod .tx { text-align: center; max-width: 100%; } }
+.pod.me .n::after { content: "  · vous"; font: 400 0.62em/1 var(--f-ui); letter-spacing: 0.16em; text-transform: uppercase; color: #ffd25a; }
+.rest { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #ffd25a rgba(255, 255, 255, 0.08); padding-right: 4px; outline: none; }
+.rest::-webkit-scrollbar { width: 8px; } .rest::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); } .rest::-webkit-scrollbar-thumb { background: #ffd25a; border-radius: 4px; }
+.cols { position: sticky; top: 0; z-index: 2; display: grid; grid-template-columns: 3.4rem 1fr 6rem 4.4rem; gap: 10px; padding: 8px 12px; background: #0c0d0f; border-bottom: 1px solid rgba(255, 255, 255, 0.25); font: 400 0.68rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); }
+.cols span:nth-child(3), .cols span:nth-child(4) { text-align: right; }
+.row { display: grid; grid-template-columns: 3.4rem 1fr 6rem 4.4rem; align-items: center; gap: 10px; min-width: 0; padding: 0 12px; height: clamp(40px, 7vh, 54px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: clamp(1rem, 2.6vh, 1.2rem); opacity: 0; transform: translateX(-8px); animation: rowIn 0.5s ease forwards; animation-delay: var(--d, 0s); }
+.row:nth-child(odd) { background: rgba(255, 255, 255, 0.055); }
+@keyframes rowIn { to { opacity: 1; transform: none; } }
+/* lisibilité : police sans empattement, texte blanc, chiffres alignés */
+.row .rk { font: 500 0.95em/1 var(--f-ui); color: #ffd25a; font-variant-numeric: tabular-nums; }
+.row .nm { font: 500 1em/1.1 var(--f-ui); color: #fff; letter-spacing: 0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.row .sc, .row .tm { font: 500 0.95em/1 var(--f-ui); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+.row .sc { color: #fff; }
+.row .tm { color: #c9c9c9; font-weight: 400; }
+.row.me { background: rgba(255, 210, 90, 0.2); box-shadow: inset 3px 0 0 #ffd25a; }
+.row.me .nm::after { content: "  · vous"; font: 500 0.64em/1 var(--f-ui); letter-spacing: 0.14em; text-transform: uppercase; color: #ffd25a; }
+.empty { font: italic 400 clamp(1.3rem, 3vw, 1.8rem)/1.5 var(--f-title); color: #cfcfcf; text-align: center; margin: auto; }
+.acts { flex: none; display: flex; gap: 14px 22px; align-items: center; margin-top: clamp(8px, 1.6vh, 14px); flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 24px; border: 1px solid #fff; border-radius: 2px; background: #ececec; color: #0a0a0a; text-decoration: none; font: 400 0.82rem/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer; }
 .btn:hover, .btn:focus-visible { background: #fff; outline: none; }
-@media (max-width: 620px) { .pod .n { font-size: 1.05rem; } th.ou, td.ou { display: none; } main { padding-top: 64px; } }
-@media (prefers-reduced-motion: reduce) { .live i { animation: none; } }
+.note { margin: 0 0 0 auto; color: var(--dim); font-size: 0.8rem; line-height: 1.4; max-width: 34ch; text-align: right; }
+@media (max-width: 620px) { .note { margin: 0; text-align: left; } .cols, .row { grid-template-columns: 2.9rem 1fr 4.8rem 3.8rem; gap: 8px; padding-left: 8px; padding-right: 8px; } }
+@media (prefers-reduced-motion: reduce) { .live i { animation: none; } .pod { transition: none; } .row { animation: none; opacity: 1; transform: none; } }
 </style>
 <script>
 /* Lien de déploiement Google Apps Script (Google Sheet des scores) */
@@ -66,70 +81,92 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
 <body>
 <div class="bg" aria-hidden="true"></div>
 <a class="back" href="theme.html" id="back">&larr; Retour</a>
+<button class="projb" id="projB" type="button" aria-pressed="false">Mode projection</button>
 <main>
-  <p class="k">Le Petit Chaperon rouge</p>
-  <h1>Le <em>classement</em></h1>
-  <p class="sub">Les joueurs sont classés par nombre de bonnes réponses, puis par temps total de réponse. Chacun garde son meilleur résultat.</p>
-  <div class="live" id="live"><i></i><span id="liveTxt">Chargement du classement</span></div>
-  <div class="podium" id="podium" aria-label="Podium"></div>
-  <table id="tbl" hidden>
-    <caption>Tous les joueurs</caption>
-    <thead><tr><th>Rang</th><th>Joueur</th><th>Score</th><th>Temps</th><th class="ou">Issue</th></tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
+  <div class="head">
+    <div><p class="k">Le Petit Chaperon rouge</p><h1>Le <em>classement</em></h1></div>
+    <div class="live" id="live"><i></i><span id="liveTxt">Chargement du classement</span></div>
+  </div>
+  <div class="podium" id="podium" aria-label="Podium" hidden>
+    <div class="pod p1" id="pod1"><div class="r">1er</div><div class="tx"><div class="n"></div><div class="s"></div></div></div>
+    <div class="pod p2" id="pod2"><div class="r">2e</div><div class="tx"><div class="n"></div><div class="s"></div></div></div>
+    <div class="pod p3" id="pod3"><div class="r">3e</div><div class="tx"><div class="n"></div><div class="s"></div></div></div>
+  </div>
+  <div class="rest" id="rest" aria-label="Autres joueurs (la liste défile)" tabindex="0"></div>
   <p class="empty" id="empty" hidden>Personne n'a encore traversé la forêt.<br>Soyez le premier.</p>
-  <p class="note" id="note" hidden></p>
-  <a class="btn" href="quiz.html" id="again">Jouer au quiz</a>
+  <div class="acts">
+    <a class="btn" href="quiz.html" id="again">Jouer au quiz</a>
+    <p class="note" id="note" hidden></p>
+  </div>
 </main>
 <script>
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
-  var TOTAL_DEFAULT = 10, myId = null, loaded = false;
+  var TOTAL_DEFAULT = 10, myId = null, loaded = false, revealed = false, laid = false, list = [];
   var mm = function (ms) { if (ms >= 9999000) return "—"; var s = Math.round(ms / 1000), m = Math.floor(s / 60); return m + ":" + ("0" + (s % 60)).slice(-2); };
   var rk = function (i) { return i === 0 ? "1er" : (i + 1) + "e"; };
+  var myName = ""; try { var mb = JSON.parse(localStorage.getItem("cpr_best") || "null"); if (mb && mb.name) myName = String(mb.name).trim().toUpperCase(); } catch (e) {}
+  try { myId = localStorage.getItem("cpr_pid"); } catch (e) {}
+  var isMe = function (p) { return !!p && ((p.id && p.id === myId) || (p.key && p.key === myName)); };
+  var stats = function (p) { return p.score + " / " + (p.total || TOTAL_DEFAULT) + (p.ms < 9999000 ? "  ·  " + mm(p.ms) : ""); };
 
-  function render(list) {
-    loaded = true;
-    list.sort(function (a, b) { return (b.score - a.score) || (a.ms - b.ms) || (a.at - b.at); });
-    $("liveTxt").textContent = list.length + (list.length > 1 ? " joueurs" : " joueur") + "  ·  mise à jour en direct";
-    $("empty").hidden = list.length > 0; $("tbl").hidden = list.length === 0; $("note").hidden = true;
-    var pod = $("podium"); pod.textContent = "";
-    list.slice(0, 3).forEach(function (p, i) {
-      var d = document.createElement("div"); d.className = "pod p" + (i + 1);
-      var r = document.createElement("div"); r.className = "r"; r.textContent = rk(i);
-      var n = document.createElement("div"); n.className = "n"; n.textContent = p.name || "Anonyme";
-      var s = document.createElement("div"); s.className = "s"; s.textContent = p.score + " / " + (p.total || TOTAL_DEFAULT) + "  ·  " + mm(p.ms);
-      d.appendChild(r); d.appendChild(n); d.appendChild(s); pod.appendChild(d);
+  /* Podium : le 3e, le 2e puis le 1er apparaissent (une seule fois) */
+  function podium() {
+    var pd = $("podium"); pd.hidden = list.length === 0;
+    [1, 2, 3].forEach(function (n) {
+      var el = $("pod" + n), p = list[n - 1]; el.style.visibility = p ? "visible" : "hidden"; if (!p) return;
+      el.className = "pod p" + n + (isMe(p) ? " me" : "") + (el.classList.contains("in") ? " in" : "");
+      el.querySelector(".n").textContent = p.name || "Anonyme"; el.querySelector(".s").textContent = stats(p);
     });
-    var body = $("rows"); body.textContent = "";
-    list.forEach(function (p, i) {
-      var tr = document.createElement("tr"); if ((p.id && p.id === myId) || (p.key && p.key === myName)) tr.className = "me";
-      function td(c, t) { var e = document.createElement("td"); e.className = c; e.textContent = t; tr.appendChild(e); return e; }
-      td("rk", rk(i)); td("nm", p.name || "Anonyme"); td("sc", p.score + " / " + (p.total || TOTAL_DEFAULT)); td("tm", mm(p.ms));
-      var o = td("ou", ""); if (p.outcome) { var dot = document.createElement("span"); dot.className = "dot" + (p.outcome === "loup" ? " w" : ""); o.appendChild(dot);
-      o.appendChild(document.createTextNode(p.outcome === "loup" ? "Rattrapé par le loup" : "Lumière rendue")); } else { o.textContent = "—"; }
-      body.appendChild(tr);
+    if (!revealed && list.length) { revealed = true; [3, 2, 1].forEach(function (n, k) { setTimeout(function () { var e = $("pod" + n); if (list[n - 1]) e.classList.add("in"); }, 300 + k * 700); }); }
+    else [1, 2, 3].forEach(function (n) { if (list[n - 1]) $("pod" + n).classList.add("in"); });
+  }
+
+  /* Liste : tous les autres joueurs, répartis en colonnes pour tenir dans l'écran sans défilement */
+  function layout() {
+    var rest = $("rest"), rows = list.slice(3), n = rows.length, keep = rest.scrollTop;
+    rest.textContent = ""; if (!n) { rest.style.display = "none"; return; }
+    rest.style.display = "";
+    var cols = document.createElement("div"); cols.className = "cols";
+    ["Rang", "Joueur", "Score", "Temps"].forEach(function (t) { var e = document.createElement("span"); e.textContent = t; cols.appendChild(e); });
+    rest.appendChild(cols);
+    var frag = document.createDocumentFragment(), mine = null;
+    rows.forEach(function (p, k) {
+      var r = document.createElement("div"); r.className = "row" + (isMe(p) ? " me" : ""); if (isMe(p) && !mine) mine = r;
+      if (laid) { r.style.animation = "none"; r.style.opacity = "1"; r.style.transform = "none"; } else r.style.setProperty("--d", Math.min(1.2, k * 0.03).toFixed(2) + "s");
+      [["rk", rk(k + 3)], ["nm", p.name || "Anonyme"], ["sc", p.score + " / " + (p.total || TOTAL_DEFAULT)], ["tm", mm(p.ms)]].forEach(function (x) { var e = document.createElement("span"); e.className = x[0]; e.textContent = x[1]; r.appendChild(e); });
+      frag.appendChild(r);
     });
+    rest.appendChild(frag);
+    /* la liste défile ; au premier affichage, elle se place sur la ligne du joueur pour qu'il se retrouve tout de suite */
+    if (!laid && mine) { var top = mine.offsetTop - rest.clientHeight / 2 + mine.offsetHeight / 2; rest.scrollTop = Math.max(0, top); } else rest.scrollTop = keep;
+    laid = true;
+  }
+  var lt = null; window.addEventListener("resize", function () { clearTimeout(lt); lt = setTimeout(layout, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
+  function render(arr) {
+    loaded = true; arr.sort(function (a, b) { return (b.score - a.score) || (a.ms - b.ms) || (a.at - b.at); }); list = arr;
+    $("liveTxt").textContent = list.length + (list.length > 1 ? " joueurs" : " joueur") + "  ·  mise à jour en direct"; $("note").hidden = true;
+    $("empty").hidden = list.length > 0; podium(); layout();
   }
 
   function offline(msg) {
     if (loaded) return;
     $("liveTxt").textContent = msg || "Classement indisponible";
     var mine = null; try { mine = JSON.parse(localStorage.getItem("cpr_best") || "null"); } catch (e) {}
-    $("note").hidden = false;
-    $("note").textContent = "Le classement des joueurs n'a pas pu être chargé. Réessayez dans un instant.";
+    $("note").hidden = false; $("note").textContent = "Le classement des joueurs n'a pas pu être chargé. Réessayez dans un instant.";
     if (mine) { myId = "me"; render([{ id: "me", name: mine.name, score: mine.score, total: mine.total, ms: mine.ms, outcome: mine.outcome, at: mine.at }]); $("liveTxt").textContent = "Classement indisponible  ·  votre meilleur résultat"; $("note").hidden = false; }
   }
 
   /* Le classement est lu dans le Google Sheet (application web Apps Script), puis actualisé toutes les 15 secondes. */
-  try { myId = localStorage.getItem("cpr_pid"); } catch (e) {}
   var URL_ = window.CPR_CONFIG && CPR_CONFIG.SCORES_URL;
-  if (!URL_) { $("liveTxt").textContent = "Classement non connecté"; $("note").hidden = false; $("note").textContent = "L'adresse du Google Sheet n'est pas encore renseignée."; offline("Classement non connecté"); return; }
+  if (!URL_) { $("note").hidden = false; $("note").textContent = "L'adresse du Google Sheet n'est pas encore renseignée."; offline("Classement non connecté"); return; }
   /* Format du script Apps Script existant : lecture JSONP (?action=get&callback=...) qui renvoie une liste {playerName, score, totalTime, date}. */
-  function norm(list) {
+  function norm(l) {
     var best = {};
-    list.forEach(function (e) {
+    l.forEach(function (e) {
       if (!e) return; var sc = Number(e.score); if (isNaN(sc)) return;
       var nm = String(e.playerName || e.name || "Anonyme"), t = Number(e.totalTime), key = nm.trim().toUpperCase();
       var p = { name: nm, score: sc, total: TOTAL_DEFAULT, ms: (t > 0 && t < 9999) ? t * 1000 : 9999000, at: 0, key: key };
@@ -137,7 +174,6 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
     });
     var out = []; for (var k in best) out.push(best[k]); return out;
   }
-  var myName = ""; try { var mb = JSON.parse(localStorage.getItem("cpr_best") || "null"); if (mb && mb.name) myName = String(mb.name).trim().toUpperCase(); } catch (e) {}
   function pull() {
     var cb = "gsCb" + Date.now(), sc = document.createElement("script"), done = false;
     function clean() { try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc.parentNode) sc.parentNode.removeChild(sc); }
@@ -147,6 +183,21 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
     sc.src = URL_ + (URL_.indexOf("?") < 0 ? "?" : "&") + "action=get&callback=" + cb + "&t=" + Date.now();
     document.body.appendChild(sc);
   }
+  /* Mode projection : plein écran, grands caractères, défilement automatique de la liste (pour projeter sur Teams). */
+  var projOn = false, scT = null, dir = 1, wait = 0;
+  function projAuto() {
+    var r = $("rest"); if (!projOn) return; if (wait > 0) { wait--; return; }
+    if (r.scrollHeight <= r.clientHeight + 2) return;
+    r.scrollTop += dir; if (dir > 0 && r.scrollTop + r.clientHeight >= r.scrollHeight - 1) { dir = -1; wait = 60; } else if (dir < 0 && r.scrollTop <= 0) { dir = 1; wait = 60; }
+  }
+  function proj(on) {
+    projOn = on; document.body.classList.toggle("proj", on); $("projB").textContent = on ? "Quitter" : "Mode projection"; $("projB").setAttribute("aria-pressed", on ? "true" : "false");
+    clearInterval(scT); if (on) { dir = 1; wait = 60; scT = setInterval(projAuto, 40); var de = document.documentElement; try { if (de.requestFullscreen && !document.fullscreenElement) de.requestFullscreen().catch(function () {}); } catch (e) {} }
+    else { try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (e) {} }
+  }
+  $("projB").addEventListener("click", function () { proj(!projOn); });
+  document.addEventListener("fullscreenchange", function () { if (!document.fullscreenElement && projOn) proj(false); });
+  document.addEventListener("keydown", function (e) { if ((e.key === "p" || e.key === "P") && !e.ctrlKey && !e.metaKey && !e.altKey) proj(!projOn); });
   pull(); setInterval(function () { if (!document.hidden) pull(); }, 15000);
 })();
 </script>
