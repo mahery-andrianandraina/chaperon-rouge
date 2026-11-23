@@ -113,7 +113,8 @@ body.done .frame { display: none; }
 <script>
 /* Les valeurs viennent de quiz.html (?v=lien vidéo&t=thème). Valeurs de secours si la page est ouverte seule. */
 var DEFAULT_VIDEO = "https://res.cloudinary.com/VOTRE_CLOUD/video/upload/VOTRE_VIDEO.mp4";
-var DEFAULT_THEME = "Lobaka fotsy + Jean Bleu + Tennis Fotsy";
+var DEFAULT_THEME = "Look élégant";
+var DEFAULT_INFO = "La couleur est libre, l'élégance est obligatoire.";
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
@@ -157,7 +158,7 @@ var DEFAULT_THEME = "Lobaka fotsy + Jean Bleu + Tennis Fotsy";
     });
     var L = h.querySelectorAll("span > span"); Array.prototype.forEach.call(L, function (e, k) { e.style.setProperty("--i", L.length - 1 - k); });
     h.setAttribute("aria-label", THEME);
-    $("quote").hidden = false; $("acts").hidden = false; recap();
+    $("quote").textContent = qs.get("e") || DEFAULT_INFO; $("quote").hidden = false; $("acts").hidden = false; recap();
   }
   /* récapitulatif du joueur (transmis par le quiz) + rang lu dans le Google Sheet */
   var SCORES_URL = "https://script.google.com/macros/s/AKfycbwGoSo8WkUffTJhof1Mi-li7DTE7EZbNGS-vKnWe8GTT_686T6_5sDzbfspNPd37LgK/exec";
