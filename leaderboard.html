@@ -105,7 +105,6 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
   <div class="rest" id="rest" aria-label="Autres joueurs (la liste défile)" tabindex="0"></div>
   <p class="empty" id="empty" hidden>Personne n'a encore traversé la forêt.<br>Soyez le premier.</p>
   <div class="acts">
-    <a class="btn" href="quiz.html" id="again">Jouer au quiz</a>
     <p class="note" id="note" hidden></p>
   </div>
 </main>
@@ -184,12 +183,23 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
     });
     var out = []; for (var k in best) out.push(best[k]); return out;
   }
+  function accept(data) { var arr = Array.isArray(data) ? data : (data && Array.isArray(data.rows) ? data.rows : null); if (!arr) return false; render(norm(arr)); return true; }
+  /* Plan B : si le navigateur bloque la lecture « script » (JSONP), on lit la réponse avec fetch() */
+  function pullFetch() {
+    if (!window.fetch) { if (!loaded) offline(); return; }
+    var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 25000);
+    fetch(URL_ + (URL_.indexOf("?") < 0 ? "?" : "&") + "action=get&t=" + Date.now(), { cache: "no-store", signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.text(); })
+      .then(function (t) { clearTimeout(to); var m = t.match(/^[^\[{]*([\[{][\s\S]*[\]}])[^\]}]*$/); var ok = false; try { ok = accept(JSON.parse(m ? m[1] : t)); } catch (e) {} if (!ok && !loaded) offline(); })
+      .catch(function () { clearTimeout(to); if (!loaded) offline(); });
+  }
   function pull() {
     var cb = "gsCb" + Date.now(), sc = document.createElement("script"), done = false;
     function clean() { try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc.parentNode) sc.parentNode.removeChild(sc); }
-    var to = setTimeout(function () { if (done) return; done = true; clean(); if (!loaded) offline(); }, 30000);
-    window[cb] = function (data) { if (done) return; done = true; clearTimeout(to); clean(); var arr = Array.isArray(data) ? data : (data && Array.isArray(data.rows) ? data.rows : null); if (!arr) { if (!loaded) offline(); return; } render(norm(arr)); };
-    sc.onerror = function () { if (done) return; done = true; clearTimeout(to); clean(); if (!loaded) offline(); };
+    function fail() { if (done) return; done = true; clearTimeout(to); clean(); pullFetch(); }
+    var to = setTimeout(fail, 10000);
+    window[cb] = function (data) { if (done) return; done = true; clearTimeout(to); clean(); if (!accept(data)) pullFetch(); };
+    sc.onerror = fail;
     sc.src = URL_ + (URL_.indexOf("?") < 0 ? "?" : "&") + "action=get&callback=" + cb + "&t=" + Date.now();
     document.body.appendChild(sc);
   }
