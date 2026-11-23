@@ -924,7 +924,8 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
 </script>
 <script>
 /* ======================= À MODIFIER ======================= */
-var THEME = "Lobaka fotsy + Jean Bleu + Tennis Fotsy";   /* le thème, affiché sur la page theme.html après la vidéo */
+var THEME = "Look élégant";   /* le thème, affiché sur la page theme.html après la vidéo */
+var THEME_INFO = "La couleur est libre, l'élégance est obligatoire.";   /* explication affichée sous le thème */
 var VIDEO_URL = "https://res.cloudinary.com/djz4uow1p/video/upload/v1794603780/fond_objuk7.mp4";   /* lien Cloudinary de la vidéo */
 var MAX_ERRORS = 3;                                       /* erreurs D'AFFILÉE permises : à la 3e, le loup rattrape la fillette. Une bonne réponse remet le compteur à zéro */
 var DAWN_SECONDS = 10;                                    /* durée de l'animation de lumière */
@@ -1162,7 +1163,7 @@ var QUESTIONS = [
     if (!url) return;
     try { fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ playerName: rec.name, totalTime: Math.max(1, Math.round(rec.ms / 1000)) }, rec)), keepalive: true }).catch(function () {}); } catch (e) {}
   }
-  function goTheme() { location.href = "theme.html?v=" + encodeURIComponent(VIDEO_URL) + "&t=" + encodeURIComponent(THEME) + "&n=" + encodeURIComponent(st.name || "") + "&s=" + (st.score | 0) + "&o=" + QUESTIONS.length + "&ms=" + Math.round(st.ms || 0); }
+  function goTheme() { location.href = "theme.html?v=" + encodeURIComponent(VIDEO_URL) + "&t=" + encodeURIComponent(THEME) + "&e=" + encodeURIComponent(THEME_INFO) + "&n=" + encodeURIComponent(st.name || "") + "&s=" + (st.score | 0) + "&o=" + QUESTIONS.length + "&ms=" + Math.round(st.ms || 0); }
   function light() {
     st.phase = "light"; clearT(); document.body.classList.add("dawn"); saveScore("lumiere");
     $("main").hidden = true; $("again").hidden = true;
