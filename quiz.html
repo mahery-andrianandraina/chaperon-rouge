@@ -931,19 +931,19 @@ var MAX_ERRORS = 3;                                       /* erreurs D'AFFILÉE 
 var DAWN_SECONDS = 10;                                    /* durée de l'animation de lumière */
 var QZ_SECONDS = 20;                                      /* secondes par question */
 var QZ_MIN = 0;                                           /* score minimum pour débloquer le thème (0 = à la fin du quiz) */
-/* 10 questions sur l'histoire de l'équipe (les anciens thèmes, qui les a annoncés, les commentaires Teams).
+/* 10 questions choisies (thèmes, procédures textiles, outils).
    Ajoutez ou remplacez-les librement. c = numéro de la bonne réponse (0 = A, 1 = B, 2 = C, 3 = D). */
 var QUESTIONS = [
-  { q: "Quel a été le tout premier thème de la série ?", a: ["Stripe", "Veste + Jean Bleu", "Fitafy Malagasy", "Chapeau + Écharpe"], c: 2 },
-  { q: "Qui a annoncé le thème « Fitafy Malagasy » ?", a: ["Nantenaina RAMAMONJISOA", "Laingo RAZAFIARISON", "Lova", "Erika RAVELOMANANTSOA"], c: 1 },
-  { q: "Quel était le deuxième thème ?", a: ["Stripe", "Fitafy Malagasy", "Veste + Jean Bleu", "Pull + Short"], c: 2 },
-  { q: "Qui a annoncé le thème « Veste + Jean Bleu » ?", a: ["Lova", "Angelo RAJAONARIVONY", "Faniry RAKOTOFIRINGA", "Nantenaina RAMAMONJISOA"], c: 3 },
-  { q: "Quel thème a été annoncé juste avant celui-ci ?", a: ["Stripe", "Fitafy Malagasy", "Veste + Jean Bleu", "Jean Bleu seul"], c: 0 },
-  { q: "Qui a annoncé le thème « Stripe » ?", a: ["Laingo RAZAFIARISON", "Henintsoa RAHARIMONJY", "Andri JEAN NOELSON", "Lova"], c: 3 },
-  { q: "Dans le thème « Fitafy Malagasy », quel vêtement un commentaire cite-t-il ?", a: ["Le kimono", "Le lambahoany", "Le boubou", "Le sari"], c: 1 },
-  { q: "Qui a écrit : « afaka esorina le veste rehefa mafana ny andro » ?", a: ["Erika RAVELOMANANTSOA", "Angelo RAJAONARIVONY", "Faniry RAKOTOFIRINGA", "Lanto RAHARISANDRATANA"], c: 2 },
-  { q: "Qui a écrit : « Pas de nouvelles, bonnes nouvelles » sur le thème Stripe ?", a: ["Erika RAVELOMANANTSOA", "Henintsoa RAHARIMONJY", "Andri JEAN NOELSON", "Nantenaina RAMAMONJISOA"], c: 0 },
-  { q: "Combien de thèmes ont déjà été révélés avant celui-ci ?", a: ["2", "3", "4", "5"], c: 1 }
+  { q: "Quel est le tout premier thème spécifique annoncé ?", a: ["Stripe", "Fitafy Malagasy", "Western", "Veste + Jean Bleu"], c: 1 },
+  { q: "À quoi sert un « lab dip » ?", a: ["À tester la résistance du tissu", "À mesurer le retrait au lavage", "À calculer le prix du tissu", "À valider la couleur (nuance) du tissu teint"], c: 3 },
+  { q: "Que vérifie-t-on avec un « fit sample » ?", a: ["La résistance des coutures", "La couleur du tissu", "L'ajustement (la coupe) du vêtement sur le corps", "Le prix de revient"], c: 2 },
+  { q: "En quoi consiste l'étape de « coupe » (cutting) ?", a: ["Assembler les pièces à la machine", "Découper les pièces de tissu selon le patron", "Repasser et plier les vêtements", "Poser les étiquettes"], c: 1 },
+  { q: "Que contient une « trim card » ?", a: ["La liste des accessoires du style (référence, couleur, emplacement)", "Les mesures du vêtement", "Le planning de livraison", "Le prix du tissu"], c: 0 },
+  { q: "Quel jour le thème est-il annoncé ?", a: ["Chaque lundi", "Chaque mardi", "Chaque mercredi", "Chaque vendredi"], c: 2 },
+  { q: "Le fournisseur répond « MOQ : 5 000 pièces ». Il parle de…", a: ["Mon Offre Quasi-gratuite", "Mille Offres Quotidiennes", "Ma Option Qualité", "Minimum Order Quantity (quantité minimum à commander)"], c: 3 },
+  { q: "La packing list est le CV du carton. Elle indique…", a: ["Ses hobbies et sa couleur préférée", "Le contenu : quantités par taille, nombre de colis, poids", "Le prix de chaque article", "Le menu du déjeuner"], c: 1 },
+  { q: "Grosse bêtise dans Excel ! Quel raccourci annule la dernière action ?", a: ["Ctrl + Z", "Ctrl + Y", "Alt + F4 (puis on part vivre dans la forêt)", "Ctrl + S"], c: 0 },
+  { q: "Dans Outlook, le champ « Cci » sert à…", a: ["Prévenir le patron de tout", "Envoyer le mail plus vite", "Écrire en majuscules pour qu'on réponde", "Mettre quelqu'un en copie sans que les autres voient son adresse"], c: 3 }
 ];
 /* ========================================================== */
 
