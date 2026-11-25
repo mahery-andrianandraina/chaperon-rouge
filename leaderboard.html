@@ -148,7 +148,7 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
     [1, 2, 3].forEach(function (n) {
       var el = $("pod" + n), p = list[n - 1]; el.style.visibility = p ? "visible" : "hidden"; if (!p) return;
       el.className = "pod p" + n + (isMe(p) ? " me" : "") + (el.classList.contains("in") ? " in" : "");
-      el.querySelector(".n").textContent = p.name || "Anonyme"; el.querySelector(".s").textContent = stats(p);
+      el.querySelector(".n").textContent = (p.name || "Anonyme").toLocaleUpperCase("fr"); el.querySelector(".s").textContent = stats(p);
     });
     if (!revealed && list.length) { revealed = true; [3, 2, 1].forEach(function (n, k) { setTimeout(function () { var e = $("pod" + n); if (list[n - 1]) e.classList.add("in"); }, 300 + k * 700); }); }
     else [1, 2, 3].forEach(function (n) { if (list[n - 1]) $("pod" + n).classList.add("in"); });
@@ -166,7 +166,7 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
     rows.forEach(function (p, k) {
       var r = document.createElement("div"); r.className = "row" + (isMe(p) ? " me" : ""); if (isMe(p) && !mine) mine = r;
       if (laid) { r.style.animation = "none"; r.style.opacity = "1"; r.style.transform = "none"; } else r.style.setProperty("--d", Math.min(1.2, k * 0.03).toFixed(2) + "s");
-      [["rk", rk(k + 3)], ["nm", p.name || "Anonyme"], ["sc", p.score + " / " + (p.total || TOTAL_DEFAULT)], ["tm", mm(p.ms)]].forEach(function (x) { var e = document.createElement("span"); e.className = x[0]; e.textContent = x[1]; r.appendChild(e); });
+      [["rk", rk(k + 3)], ["nm", (p.name || "Anonyme").toLocaleUpperCase("fr")], ["sc", p.score + " / " + (p.total || TOTAL_DEFAULT)], ["tm", mm(p.ms)]].forEach(function (x) { var e = document.createElement("span"); e.className = x[0]; e.textContent = x[1]; r.appendChild(e); });
       frag.appendChild(r);
     });
     rest.appendChild(frag);
