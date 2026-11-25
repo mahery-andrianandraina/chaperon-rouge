@@ -226,7 +226,7 @@ window.CPR_CONFIG = { SCORES_URL: "https://script.google.com/macros/s/AKfycbwGoS
     sc.src = URL_ + (URL_.indexOf("?") < 0 ? "?" : "&") + "action=get&callback=" + cb + "&t=" + Date.now();
     document.body.appendChild(sc);
   }
-  pull(); setInterval(function () { if (!document.hidden) pull(); }, 15000);
+  pull(); setInterval(function () { if (!document.hidden) pull(); }, 5000);
 })();
 </script>
 </body>
